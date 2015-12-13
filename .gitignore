@@ -1,0 +1,5 @@
+test.py
+image/
+.idea/
+
+*.py[cd]
