@@ -3,16 +3,24 @@ import asyncio
 from asyncio import coroutine
 import jinja2
 import re
+import traceback
+from functools import partial
+
+# CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
+CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
+_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30, force_close=True)
 
 
-CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
-
-
-async def get_data(url, callback=None, as_type='json'):
-    # r = await aiohttp.get(url)
-    # data = await getattr(r, as_type)()
-    async with aiohttp.get(url) as r:
-        data = await getattr(r, as_type)()
+async def get_data(url, callback=None, as_type='json', conn=_conn):
+    try:
+        # async with aiohttp.get(url, connector=conn) as r:
+        r = await aiohttp.get(url, connector=conn)
+        if 1==1:
+            data = await getattr(r, as_type)()
+            r.close()
+    except Exception as e:
+        print('exception!..', traceback.format_exc())
+        data = ''
 
     print('finish request', url)
     if callback:
@@ -38,21 +46,23 @@ class ImageManager:
         print('prepare download', url)
         file_name = url.split('/')[-1]
         file_path = 'image/' + file_name
+        self.busying.add(url)
         await self.sem.acquire()
         print('enter downloading')
-        task = asyncio.ensure_future(get_data(url, as_type='read'))
-        self.busying.add(task)
+        task = asyncio.ensure_future(get_data(url, as_type='read',
+                                              callback=partial(self.save_file, file_path=file_path)))
         task.add_done_callback(lambda t:self.sem.release())
-        task.add_done_callback(lambda t:self.save_file(task=t, file_path=file_path))
-        task.add_done_callback(self.busying.remove)
+        # task.add_done_callback(lambda t:self.save_file(task=t, file_path=file_path))
+        task.add_done_callback(lambda t:self.busying.remove(url))
 
-    def save_file(self, task, file_path):
-        print('save file to ', file_path)
-        try:
-            content = task.result()
-        except Exception as e:
-            print('got exception!', e)
+    async def save_file(self, data, url, file_path):
+        content = data
+        if not content:
+            print('no data available')
             return
+
+        print('save file to ', file_path)
+
 
         with open(file_path, 'wb') as f:
             f.write(content)
@@ -65,7 +75,18 @@ class ImageManager:
             if not self.busying:
                 break
 
+        # for t in asyncio.Task.all_tasks():
+        #     t.cancel()
+        #     print('exit task',t)
         self.loop.stop()
+
+    async def inter_status_info(self, inter=3):
+        print('start inter status info function!')
+        while self.busying:
+            print('this is {} in busying'.format(len(self.busying)))
+            urls = [url for i, url in enumerate(self.busying) if i<3]
+            print('urls[3] is', urls)
+            await asyncio.sleep(inter)
 
 
 def url_page_combine(base_url, num):
@@ -128,8 +149,6 @@ class Block:
         return self._block.get(item)
 
 
-
-
     def reply_to(self):
         """
         解析里面回复的id, 返回ids
@@ -157,8 +176,10 @@ class Block:
 
 
 def sanitize_url(url):
-
-    return url
+    from urllib import parse
+    parts = parse.urlsplit(url)
+    path = '/api' + parts.path
+    return parse.urlunsplit((parts.scheme, parts.netloc, path, '',''))
 
 
 
@@ -174,28 +195,22 @@ async def run(first_url, loop):
             print(block.uid, block.image_url, block.reply_to() or None)
         if p.has_next():
             p=await Page.from_url(*p.next_page_info)
-
-        if p.next_page_num > 15:
+        else:
             break
+        if p.next_page_num > 1:
+            break
+    # asyncio.ensure_future(image_manager.inter_status_info())
     await image_manager.wait_all_task_done()
 
 
 
-# url = input()
-# first_url = sanitize_url(url)
-# first_url = 'http://h.nimingban.com/api/t/7250124'
-first_url = 'http://h.nimingban.com/api/t/103123'
-# while True:
-#     p = Page(url)
-#     blocks = p.thread_list()
-#     for b in blocks:
-#         b.do_something()
-#
-#     if p.has_next():
-#         p = Page(p.next_page_url)
-#     else:
-#         break
 
+# first_url = input('url\n')
+# first_url = 'http://h.nimingban.com/t/117617?page=10'
+first_url = 'http://h.nimingban.com/t/7250124?page=123'
+first_url = sanitize_url(first_url)
+
+print('first url is', first_url)
 loop = asyncio.get_event_loop()
 image_manager = ImageManager(loop)
 loop.create_task(run(first_url, loop))
