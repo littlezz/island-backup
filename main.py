@@ -13,9 +13,7 @@ _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30, force_close=True)
 
 async def get_data(url, callback=None, as_type='json', conn=_conn):
     try:
-        # async with aiohttp.get(url, connector=conn) as r:
-        r = await aiohttp.get(url, connector=conn)
-        if 1==1:
+        async with aiohttp.get(url, connector=conn) as r:
             data = await getattr(r, as_type)()
             r.close()
     except Exception as e:
@@ -52,7 +50,6 @@ class ImageManager:
         task = asyncio.ensure_future(get_data(url, as_type='read',
                                               callback=partial(self.save_file, file_path=file_path)))
         task.add_done_callback(lambda t:self.sem.release())
-        # task.add_done_callback(lambda t:self.save_file(task=t, file_path=file_path))
         task.add_done_callback(lambda t:self.busying.remove(url))
 
     async def save_file(self, data, url, file_path):
@@ -199,21 +196,20 @@ async def run(first_url, loop):
             break
         if p.next_page_num > 1:
             break
-    # asyncio.ensure_future(image_manager.inter_status_info())
+    asyncio.ensure_future(image_manager.inter_status_info())
     await image_manager.wait_all_task_done()
 
 
 
 
 # first_url = input('url\n')
-# first_url = 'http://h.nimingban.com/t/117617?page=10'
-first_url = 'http://h.nimingban.com/t/7250124?page=123'
+first_url = 'http://h.nimingban.com/t/117617?page=10'
+# first_url = 'http://h.nimingban.com/t/7250124?page=123'
 first_url = sanitize_url(first_url)
 
 print('first url is', first_url)
 loop = asyncio.get_event_loop()
 image_manager = ImageManager(loop)
 loop.create_task(run(first_url, loop))
-
 loop.run_forever()
 
