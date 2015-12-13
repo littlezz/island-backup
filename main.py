@@ -8,8 +8,8 @@ from functools import partial
 
 # CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
 CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
-_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30, force_close=True)
-
+_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30)
+_daemon_task = set()
 
 async def get_data(url, callback=None, as_type='json', conn=_conn):
     try:
@@ -75,15 +75,21 @@ class ImageManager:
         # for t in asyncio.Task.all_tasks():
         #     t.cancel()
         #     print('exit task',t)
+        # for t in _daemon_task:
+        #     t.cancel()
         self.loop.stop()
 
-    async def inter_status_info(self, inter=3):
+    def inter_status_info(self, inter=3):
         print('start inter status info function!')
-        while self.busying:
-            print('this is {} in busying'.format(len(self.busying)))
-            urls = [url for i, url in enumerate(self.busying) if i<3]
-            print('urls[3] is', urls)
-            await asyncio.sleep(inter)
+        async def _status_info():
+            while self.busying:
+                print('this is {} in busying'.format(len(self.busying)))
+                urls = [url for i, url in enumerate(self.busying) if i<3]
+                print('urls[3] is', urls)
+                await asyncio.sleep(inter)
+        task = self.loop.create_task(_status_info())
+        _daemon_task.add(task)
+
 
 
 def url_page_combine(base_url, num):
@@ -194,17 +200,17 @@ async def run(first_url, loop):
             p=await Page.from_url(*p.next_page_info)
         else:
             break
-        if p.next_page_num > 1:
+        if p.next_page_num > 10:
             break
-    asyncio.ensure_future(image_manager.inter_status_info())
+    image_manager.inter_status_info()
     await image_manager.wait_all_task_done()
 
 
 
 
 # first_url = input('url\n')
-first_url = 'http://h.nimingban.com/t/117617?page=10'
-# first_url = 'http://h.nimingban.com/t/7250124?page=123'
+# first_url = 'http://h.nimingban.com/t/117617?page=10'
+first_url = 'http://h.nimingban.com/t/7250124?page=123'
 first_url = sanitize_url(first_url)
 
 print('first url is', first_url)
