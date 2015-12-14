@@ -1,3 +1,5 @@
+import os
+
 import aiohttp
 import asyncio
 from asyncio import coroutine
@@ -8,12 +10,26 @@ from functools import partial
 
 # CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
 CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
-_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30)
-_daemon_task = set()
+_conn = aiohttp.TCPConnector(use_dns_cache=True)
+# _daemon_task = set()
+_headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, sdch',
+    'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Dnt': '1',
+    'Host': 'hacfun-tv.n1.yun.tf:8999',
+    'Pragma': 'no-cache',
+    'Referer': 'http://h.nimingban.com/t/117617?page=10',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'}
 
-async def get_data(url, callback=None, as_type='json', conn=_conn):
+
+
+async def get_data(url, callback=None, as_type='json', conn=_conn, headers=None):
     try:
-        async with aiohttp.get(url, connector=conn) as r:
+        async with aiohttp.get(url, connector=conn, headers=headers) as r:
             data = await getattr(r, as_type)()
             r.close()
     except Exception as e:
@@ -30,11 +46,12 @@ async def get_data(url, callback=None, as_type='json', conn=_conn):
 
 
 class ImageManager:
-    def __init__(self, loop, max_tasks=100):
+    def __init__(self, image_dir, loop, max_tasks=100):
         self.url_set  = set()
         self.sem = asyncio.Semaphore(max_tasks)
         self.busying = set()
         self.loop = loop
+        self.image_dir = image_dir
 
     async def submit(self, url):
         if url in self.url_set:
@@ -43,11 +60,12 @@ class ImageManager:
             self.url_set.add(url)
         print('prepare download', url)
         file_name = url.split('/')[-1]
-        file_path = 'image/' + file_name
+        file_path = os.path.join(self.image_dir, file_name)
         self.busying.add(url)
         await self.sem.acquire()
         print('enter downloading')
         task = asyncio.ensure_future(get_data(url, as_type='read',
+                                              headers=_headers,
                                               callback=partial(self.save_file, file_path=file_path)))
         task.add_done_callback(lambda t:self.sem.release())
         task.add_done_callback(lambda t:self.busying.remove(url))
@@ -68,27 +86,19 @@ class ImageManager:
     async def wait_all_task_done(self):
         print('begin waiting')
         while True:
+            self.status_info()
             await asyncio.sleep(1)
             if not self.busying:
                 break
 
-        # for t in asyncio.Task.all_tasks():
-        #     t.cancel()
-        #     print('exit task',t)
-        # for t in _daemon_task:
-        #     t.cancel()
+
         self.loop.stop()
 
-    def inter_status_info(self, inter=3):
-        print('start inter status info function!')
-        async def _status_info():
-            while self.busying:
-                print('this is {} in busying'.format(len(self.busying)))
-                urls = [url for i, url in enumerate(self.busying) if i<3]
-                print('urls[3] is', urls)
-                await asyncio.sleep(inter)
-        task = self.loop.create_task(_status_info())
-        _daemon_task.add(task)
+    def status_info(self):
+        print('this is {} in busying'.format(len(self.busying)))
+        urls = [url for i, url in enumerate(self.busying) if i<3]
+        print('urls[3] is', urls)
+
 
 
 
@@ -202,20 +212,25 @@ async def run(first_url, loop):
             break
         if p.next_page_num > 10:
             break
-    image_manager.inter_status_info()
+
     await image_manager.wait_all_task_done()
 
 
 
 
 # first_url = input('url\n')
-# first_url = 'http://h.nimingban.com/t/117617?page=10'
-first_url = 'http://h.nimingban.com/t/7250124?page=123'
+first_url = 'http://h.nimingban.com/t/117617?page=10'
+# first_url = 'http://h.nimingban.com/t/7250124?page=123'
 first_url = sanitize_url(first_url)
+folder_name = first_url.split('/')[-1]
+
+base_dir = os.path.join('backup', folder_name)
+image_dir = os.path.join(base_dir, 'image')
+os.makedirs(image_dir, exist_ok=True)
 
 print('first url is', first_url)
 loop = asyncio.get_event_loop()
-image_manager = ImageManager(loop)
+image_manager = ImageManager(image_dir, loop)
 loop.create_task(run(first_url, loop))
 loop.run_forever()
 
