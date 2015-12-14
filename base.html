@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+
+    <style>
+        html, body{
+            height: 100%;
+            width: 100%;
+        }
+
+        div {
+            padding: 10px 15px 10px 15px;
+            width: auto;
+            height: 100%;
+        }
+        .thread {
+            display: table;
+            height: auto;
+            width: 100%;
+        }
+        img {
+{#            position: absolute;#}
+            float: left;
+            width: auto;
+            height: auto;
+            max-height: 150px;
+            margin: auto;
+            display: inline;
+        }
+        .right-content {
+            float: left;
+            height: 100%;
+        }
+
+        p{
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+{% for data in queue %}
+    <div class="thread">
+        <div class="image-box">
+            <img src="{{ data.image }}">
+        </div>
+        <div class="right-content">
+            <p>id:{{ data.uid }}</p>
+            <p>{{ data.content }}</p>
+        </div>
+
+
+    </div>
+{% endfor %}
+</body>
+</html>

@@ -2,16 +2,22 @@ import os
 
 import aiohttp
 import asyncio
-from asyncio import coroutine
-import jinja2
 import re
 import traceback
 from functools import partial
+from jinja2 import Environment, FileSystemLoader
+
+#########setup#########
+_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
+env = Environment(loader=FileSystemLoader('.'), trim_blocks=True)
+
+
+
+##########constant#########
 
 # CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
 CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
-_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
-# _daemon_task = set()
+
 _headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, sdch',
@@ -24,6 +30,12 @@ _headers = {
     'Referer': 'http://h.nimingban.com/t/117617?page=10',
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'}
+
+
+
+
+def template_render(name, **context):
+    return env.get_template(name).render(**context)
 
 
 
@@ -243,4 +255,6 @@ loop = asyncio.get_event_loop()
 image_manager = ImageManager(image_dir, loop)
 loop.create_task(run(first_url, loop))
 loop.run_forever()
+
+
 
