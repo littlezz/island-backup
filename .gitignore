@@ -1,5 +1,6 @@
 test.py
 image/
 .idea/
+backup/
 
 *.py[cd]
