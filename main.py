@@ -10,7 +10,7 @@ from functools import partial
 
 # CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
 CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
-_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30, conn_timeout=60)
+_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
 # _daemon_task = set()
 _headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
