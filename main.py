@@ -103,7 +103,7 @@ class ImageManager:
         print('this is {} in busying'.format(len(self.busying)))
         urls = []
         for i, url in enumerate(self.busying):
-            if i > 3:
+            if i >= 3:
                 break
             urls.append(url)
 
