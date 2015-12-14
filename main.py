@@ -10,7 +10,7 @@ from functools import partial
 
 # CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
 CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
-_conn = aiohttp.TCPConnector(use_dns_cache=True)
+_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=30, conn_timeout=60)
 # _daemon_task = set()
 _headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -46,12 +46,17 @@ async def get_data(url, callback=None, as_type='json', conn=_conn, headers=None)
 
 
 class ImageManager:
-    def __init__(self, image_dir, loop, max_tasks=100):
+    def __init__(self, image_dir, loop, max_tasks=150):
         self.url_set  = set()
         self.sem = asyncio.Semaphore(max_tasks)
         self.busying = set()
         self.loop = loop
         self.image_dir = image_dir
+
+    def get_image_path(self, url):
+        file_name = url.split('/')[-1]
+        file_path = os.path.join(self.image_dir, file_name)
+        return file_path
 
     async def submit(self, url):
         if url in self.url_set:
@@ -59,8 +64,8 @@ class ImageManager:
         else:
             self.url_set.add(url)
         print('prepare download', url)
-        file_name = url.split('/')[-1]
-        file_path = os.path.join(self.image_dir, file_name)
+        file_path = self.get_image_path(url)
+
         self.busying.add(url)
         await self.sem.acquire()
         print('enter downloading')
@@ -87,7 +92,7 @@ class ImageManager:
         print('begin waiting')
         while True:
             self.status_info()
-            await asyncio.sleep(1)
+            await asyncio.sleep(3)
             if not self.busying:
                 break
 
@@ -96,7 +101,12 @@ class ImageManager:
 
     def status_info(self):
         print('this is {} in busying'.format(len(self.busying)))
-        urls = [url for i, url in enumerate(self.busying) if i<3]
+        urls = []
+        for i, url in enumerate(self.busying):
+            if i > 3:
+                break
+            urls.append(url)
+
         print('urls[3] is', urls)
 
 
@@ -210,7 +220,7 @@ async def run(first_url, loop):
             p=await Page.from_url(*p.next_page_info)
         else:
             break
-        if p.next_page_num > 10:
+        if p.next_page_num > 8:
             break
 
     await image_manager.wait_all_task_done()
