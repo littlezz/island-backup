@@ -6,6 +6,7 @@ import re
 import traceback
 from functools import partial
 from jinja2 import Environment, FileSystemLoader
+from datetime import datetime
 
 #########setup#########
 _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
@@ -212,6 +213,11 @@ class Block:
         :return:
         """
         self.image = path
+
+    @property
+    def created_time(self):
+        ts = int(self._block['createdAt']) / 1000
+        return datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def sanitize_url(url):
