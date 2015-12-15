@@ -8,11 +8,12 @@
         html, body{
             height: 100%;
             width: 100%;
+            background-color: #ffe;
         }
 
         div {
             padding: 10px 15px 10px 15px;
-            width: auto;
+{#            width: auto;#}
             height: 100%;
         }
         .thread {
@@ -31,6 +32,7 @@
         .right-content {
             float: left;
             height: 100%;
+            background-color: #f0e0d6;
         }
 
         p {
@@ -43,7 +45,7 @@
 </head>
 
 <body>
-{% for data in queue %}
+{% for data in all_blocks %}
     <div class="thread">
         <div class="image-box">
             <img src="{{ data.image }}">

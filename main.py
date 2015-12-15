@@ -78,6 +78,9 @@ class ImageManager:
         print('prepare download', url)
         file_path = self.get_image_path(url)
 
+        if os.path.exists(file_path):
+            return
+
         self.busying.add(url)
         await self.sem.acquire()
         print('enter downloading')
@@ -208,6 +211,7 @@ class Block:
         :param path:
         :return:
         """
+        self.image = path
 
 
 def sanitize_url(url):
@@ -216,10 +220,19 @@ def sanitize_url(url):
     path = '/api' + parts.path
     return parse.urlunsplit((parts.scheme, parts.netloc, path, '',''))
 
+def write_to_html(path, file_name, all_blocks):
+    thread_id = file_name
+    file_name = file_name + '.html'
+    save_to = os.path.join(path, file_name)
+    with open(save_to, 'w') as f:
+        f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks))
 
 
 async def run(first_url, loop):
     print('run!')
+
+    all_blocks = []
+
     p = await Page.from_url(first_url, page_num=1)
     while True:
         print('page go')
@@ -227,21 +240,26 @@ async def run(first_url, loop):
         for block in thread_list:
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url))
-            print(block.uid, block.image_url, block.reply_to() or None)
+            # print(block.uid, block.image_url, block.reply_to() or None)
+            #     block.replace_image_url(image_manager.get_image_path(block.image_url))
+                block.image = 'image/' + block.image.split('/')[-1]
+        all_blocks.extend(thread_list)
+
         if p.has_next():
             p=await Page.from_url(*p.next_page_info)
         else:
             break
-        if p.next_page_num > 8:
-            break
+        # if p.next_page_num > 1:
+        #     break
 
+    write_to_html(path=base_dir, file_name=folder_name, all_blocks=all_blocks)
     await image_manager.wait_all_task_done()
 
 
 
 
-# first_url = input('url\n')
-first_url = 'http://h.nimingban.com/t/117617?page=10'
+first_url = input('url\n')
+# first_url = 'http://h.nimingban.com/t/117617?page=10'
 # first_url = 'http://h.nimingban.com/t/7250124?page=123'
 first_url = sanitize_url(first_url)
 folder_name = first_url.split('/')[-1]
