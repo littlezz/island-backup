@@ -7,45 +7,43 @@
     <style>
         html, body{
             height: 100%;
-            width: 100%;
+{#            width: 100%;#}
             background-color: #ffe;
             font-size: 16px;
             color: #800000;
         }
 
         div {
-{#            margin: 10px 15px 10px 15px;#}
-{#            width: auto;#}
             height: 100%;
         }
 
         .thread {
             display: table;
             height: auto;
+            padding: 10px 15px 10px 15px;
+            box-sizing: border-box;
             width: 100%;
-            margin: 20px 15px 20px 15px;
-            border-radius: 10px;
         }
 
         img {
             float: left;
             height: auto;
-            max-width: 250px;
+            max-width: 25%;
             display: block;
         }
         .right-content {
             float: left;
             height: 100%;
+            width: 70%;
             background-color: #f0e0d6;
             padding: 10px 15px 10px 15px;
             margin-left: 15px;
             box-shadow: 1px 1px 3px #888888;
             border-radius: 5px;
-            max-width: 90%;
         }
 
         p {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         span {
@@ -58,17 +56,33 @@
 
 <body>
 {% for data in all_blocks %}
-    <div class="thread">
+    <div class="thread" id="{{ data.id }}">
         <div class="image-box">
-            <a href="{{ data.image }}" target="_blank"><img src="{{ data.image }}"></a>
+                <img src="{{ data.image }}" onclick="show_big(this)" data-big=0>
         </div>
         <div class="right-content">
             <p><span>{{ data.created_time}}</span> <span>ID: {{ data.uid }}</span></p>
             <p>{{ data.content }}</p>
         </div>
 
-
     </div>
 {% endfor %}
+
+
+<script>
+    function show_big(id){
+        if (id.dataset.big == 0){
+            id.style.width="100%";
+            id.style.maxWidth="100%";
+            id.dataset.big=1;
+        }
+        else {
+            id.style.width="auto";
+            id.style.maxWidth="250px";
+            id.dataset.big=0;
+        }
+
+    }
+</script>
 </body>
 </html>

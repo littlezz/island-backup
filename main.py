@@ -266,8 +266,9 @@ async def run(first_url, loop):
 
 
 first_url = input('url\n')
+# first_url = 'http://h.nimingban.com/t/117617'
 # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
-# first_url = 'http://h.nimingban.com/t/7250124?page=123'
+# first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
 first_url = sanitize_url(first_url)
 folder_name = first_url.split('/')[-1]
 
