@@ -226,6 +226,7 @@ def sanitize_url(url):
     path = '/api' + parts.path
     return parse.urlunsplit((parts.scheme, parts.netloc, path, '',''))
 
+
 def write_to_html(path, file_name, all_blocks):
     thread_id = file_name
     file_name = file_name + '.html'

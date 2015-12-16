@@ -29,11 +29,9 @@
 
         img {
             float: left;
-            width: auto;
             height: auto;
-            max-height: 200px;
-            margin: auto;
-            display: inline;
+            max-width: 250px;
+            display: block;
         }
         .right-content {
             float: left;
@@ -43,6 +41,7 @@
             margin-left: 15px;
             box-shadow: 1px 1px 3px #888888;
             border-radius: 5px;
+            max-width: 90%;
         }
 
         p {
@@ -61,7 +60,7 @@
 {% for data in all_blocks %}
     <div class="thread">
         <div class="image-box">
-            <img src="{{ data.image }}">
+            <a href="{{ data.image }}" target="_blank"><img src="{{ data.image }}"></a>
         </div>
         <div class="right-content">
             <p><span>{{ data.created_time}}</span> <span>ID: {{ data.uid }}</span></p>
