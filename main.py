@@ -206,14 +206,6 @@ class Block:
             return None
         return ''.join((CDNHOST, self.image))
 
-    def replace_image_url(self, path):
-        """
-        替换里面的url标签的内容为cache的图片地址
-        :param path:
-        :return:
-        """
-        self.image = path
-
     @property
     def created_time(self):
         ts = int(self._block['createdAt']) / 1000
@@ -231,7 +223,7 @@ def write_to_html(path, file_name, all_blocks):
     thread_id = file_name
     file_name = file_name + '.html'
     save_to = os.path.join(path, file_name)
-    with open(save_to, 'w') as f:
+    with open(save_to, 'w', encoding='utf8') as f:
         f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks))
 
 
@@ -247,8 +239,7 @@ async def run(first_url, loop):
         for block in thread_list:
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url))
-            # print(block.uid, block.image_url, block.reply_to() or None)
-            #     block.replace_image_url(image_manager.get_image_path(block.image_url))
+                # print(block.uid, block.image_url, block.reply_to() or None)
                 block.image = 'image/' + block.image.split('/')[-1]
         all_blocks.extend(thread_list)
 
