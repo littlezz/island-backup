@@ -19,6 +19,7 @@ env = Environment(loader=FileSystemLoader('templates'), trim_blocks=True)
 # CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
 CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
 
+
 _headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, sdch',
@@ -39,7 +40,6 @@ def template_render(name, **context):
     return env.get_template(name).render(**context)
 
 
-
 async def get_data(url, callback=None, as_type='json', conn=_conn, headers=None):
     try:
         async with aiohttp.get(url, connector=conn, headers=headers) as r:
@@ -56,11 +56,9 @@ async def get_data(url, callback=None, as_type='json', conn=_conn, headers=None)
         return data
 
 
-
-
 class ImageManager:
     def __init__(self, image_dir, loop, max_tasks=150):
-        self.url_set  = set()
+        self.url_set = set()
         self.sem = asyncio.Semaphore(max_tasks)
         self.busying = set()
         self.loop = loop
@@ -84,12 +82,12 @@ class ImageManager:
 
         self.busying.add(url)
         await self.sem.acquire()
-        print('enter downloading')
+        # print('enter downloading')
         task = asyncio.ensure_future(get_data(url, as_type='read',
                                               headers=_headers,
                                               callback=partial(self.save_file, file_path=file_path)))
-        task.add_done_callback(lambda t:self.sem.release())
-        task.add_done_callback(lambda t:self.busying.remove(url))
+        task.add_done_callback(lambda t: self.sem.release())
+        task.add_done_callback(lambda t: self.busying.remove(url))
 
     async def save_file(self, data, url, file_path):
         content = data
@@ -99,10 +97,9 @@ class ImageManager:
 
         print('save file to ', file_path)
 
-
         with open(file_path, 'wb') as f:
             f.write(content)
-        print('sace sucess!')
+        print('save success!')
 
     async def wait_all_task_done(self):
         print('begin waiting')
@@ -111,7 +108,6 @@ class ImageManager:
             await asyncio.sleep(3)
             if not self.busying:
                 break
-
 
         self.loop.stop()
 
@@ -126,12 +122,8 @@ class ImageManager:
         print('urls[3] is', urls)
 
 
-
-
 def url_page_combine(base_url, num):
     return base_url + '?page=' + str(num)
-
-
 
 
 class Page:
@@ -139,8 +131,6 @@ class Page:
         self._page = page_num
         self.base_url = url
         self.data = data
-
-
 
     @classmethod
     async def from_url(cls, base_url, page_num):
@@ -158,23 +148,18 @@ class Page:
         ext.insert(0, top)
         return ext
 
-
-
     @property
     def next_page_num(self):
         if self.has_next():
             return self._page + 1
 
-
     @property
     def next_page_info(self):
         page_num = self._page + 1
-        return (self.base_url, page_num)
+        return self.base_url, page_num
 
     def has_next(self):
         return self._page < self.data['page']['size']
-
-
 
 
 class Block:
@@ -183,10 +168,8 @@ class Block:
     def __init__(self, block_dict):
         self._block = block_dict
 
-
     def __getattr__(self, item):
         return self._block.get(item)
-
 
     def reply_to(self):
         """
@@ -194,7 +177,6 @@ class Block:
         :return: list
         """
         return re.findall(r'No\.(\d+)', self.content)
-
 
     @property
     def image_url(self):
@@ -216,7 +198,7 @@ def sanitize_url(url):
     from urllib import parse
     parts = parse.urlsplit(url)
     path = '/api' + parts.path
-    return parse.urlunsplit((parts.scheme, parts.netloc, path, '',''))
+    return parse.urlunsplit((parts.scheme, parts.netloc, path, '', ''))
 
 
 def write_to_html(path, file_name, all_blocks, page_obj=None):
@@ -262,13 +244,10 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         all_blocks.extend(thread_list)
 
         if p.has_next():
-            p=await Page.from_url(*p.next_page_info)
+            p = await Page.from_url(*p.next_page_info)
         else:
             break
-        # if p.next_page_num > 1:
-        #     break
 
-    # write_to_html(path=base_dir, file_name=folder_name, all_blocks=all_blocks)
     split_page_write(path=base_dir, filename=folder_name, blocks=all_blocks, page_num=50)
     await image_manager.wait_all_task_done()
 
@@ -293,8 +272,5 @@ def main():
     loop.run_forever()
 
 
-
 if __name__ == '__main__':
     main()
-
-
