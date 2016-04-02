@@ -10,7 +10,7 @@ from datetime import datetime
 
 #########setup#########
 _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
-env = Environment(loader=FileSystemLoader('.'), trim_blocks=True)
+env = Environment(loader=FileSystemLoader('templates'), trim_blocks=True)
 
 
 
@@ -219,15 +219,33 @@ def sanitize_url(url):
     return parse.urlunsplit((parts.scheme, parts.netloc, path, '',''))
 
 
-def write_to_html(path, file_name, all_blocks):
+def write_to_html(path, file_name, all_blocks, page_obj=None):
     thread_id = file_name
     file_name = file_name + '.html'
     save_to = os.path.join(path, file_name)
     with open(save_to, 'w', encoding='utf8') as f:
-        f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks))
+        f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks, page_obj=page_obj))
 
 
-async def run(first_url, loop):
+def split_page_write(path, filename, blocks, page_num=50):
+    if not page_num:
+        write_to_html(path, filename, blocks)
+
+    chunks = [blocks[i: i+page_num] for i in range(0, len(blocks), page_num)]
+    max_page = len(chunks) - 1
+
+    for idx, chunk in enumerate(chunks):
+        page_filename = filename + '_' + str(idx)
+        page_obj = {'prev': filename + '_' + str(idx-1) + '.html',
+                    'next': filename + '_' + str(idx+1) + '.html'}
+        if idx == 0:
+            page_obj.pop('prev')
+        if idx == max_page:
+            page_obj.pop('next')
+        write_to_html(path, page_filename, chunk, page_obj)
+
+
+async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None):
     print('run!')
 
     all_blocks = []
@@ -250,28 +268,33 @@ async def run(first_url, loop):
         # if p.next_page_num > 1:
         #     break
 
-    write_to_html(path=base_dir, file_name=folder_name, all_blocks=all_blocks)
+    # write_to_html(path=base_dir, file_name=folder_name, all_blocks=all_blocks)
+    split_page_write(path=base_dir, filename=folder_name, blocks=all_blocks, page_num=50)
     await image_manager.wait_all_task_done()
 
 
+def main():
+
+    first_url = input('url\n')
+    # first_url = 'http://h.nimingban.com/t/117617'
+    # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
+    # first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
+    first_url = sanitize_url(first_url)
+    folder_name = first_url.split('/')[-1]
+
+    base_dir = os.path.join('backup', folder_name)
+    image_dir = os.path.join(base_dir, 'image')
+    os.makedirs(image_dir, exist_ok=True)
+
+    print('first url is', first_url)
+    loop = asyncio.get_event_loop()
+    image_manager = ImageManager(image_dir, loop)
+    loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
+    loop.run_forever()
 
 
-first_url = input('url\n')
-# first_url = 'http://h.nimingban.com/t/117617'
-# first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
-# first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
-first_url = sanitize_url(first_url)
-folder_name = first_url.split('/')[-1]
 
-base_dir = os.path.join('backup', folder_name)
-image_dir = os.path.join(base_dir, 'image')
-os.makedirs(image_dir, exist_ok=True)
-
-print('first url is', first_url)
-loop = asyncio.get_event_loop()
-image_manager = ImageManager(image_dir, loop)
-loop.create_task(run(first_url, loop))
-loop.run_forever()
-
+if __name__ == '__main__':
+    main()
 
 
