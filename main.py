@@ -8,11 +8,6 @@ from functools import partial
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 
-#########setup#########
-_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
-env = Environment(loader=FileSystemLoader('templates'), trim_blocks=True)
-
-
 
 ##########constant#########
 
@@ -34,15 +29,22 @@ _headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'}
 
 
+#########setup#########
+_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
+env = Environment(loader=FileSystemLoader('templates'), trim_blocks=True)
+session = aiohttp.ClientSession(connector=_conn)
+
+
+################
 
 
 def template_render(name, **context):
     return env.get_template(name).render(**context)
 
 
-async def get_data(url, callback=None, as_type='json', conn=_conn, headers=None):
+async def get_data(url, callback=None, as_type='json', headers=None):
     try:
-        async with aiohttp.get(url, connector=conn, headers=headers) as r:
+        async with session.get(url, headers=headers) as r:
             data = await getattr(r, as_type)()
             r.close()
     except Exception as e:
