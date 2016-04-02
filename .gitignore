@@ -2,5 +2,8 @@ test.py
 image/
 .idea/
 backup/
+.DS_Store
+test_run.py
+test.html
 
 *.py[cd]

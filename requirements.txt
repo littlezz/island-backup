@@ -1,0 +1,3 @@
+aiohttp
+Jinja2
+requests
