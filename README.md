@@ -5,18 +5,31 @@ Island Backup
 备份匿名版上的串, 图片到本地, 以html形式查看  
 
 
+特性
+-----
+- 支持A岛 (http://h.nimingban.com/)
+- 支持kukuku (http://kukuku.cc/)
+- 自动备份图片
+- 自动分页  
+- 并发下载  
+- 使用aiohttp而非多线程
+
+
 使用方法
 -------
-需要python >= 3.5
+需要python >= 3.5  
+依赖库请查看requirements.txt  
+
 
 `python3 main.py`  
 
-输入 url , 目前只至此 h.nimingban.com 的串  
+输入 url , 目前兹瓷 h.nimingban.com 和 kukuku.cc 的串  
 
 ```shell
 url
 http://h.nimingban.com/t/6048436?r=6048436
 ```
+
 
 内容在backup文件夹里面.  
 
