@@ -25,14 +25,16 @@ Island Backup
 依赖库请查看requirements.txt  
 
 
-`python3 main.py`  
-
 输入 url , 目前兹瓷 h.nimingban.com 和 kukuku.cc 的串  
 
+`python3 main.py http://h.nimingban.com/t/6048436?r=6048436`  
+
+或者
+
 ```shell
-url
-http://h.nimingban.com/t/6048436?r=6048436
-```
+python3 main.py  
+Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
+```  
 
 
 内容在backup文件夹里面.  
