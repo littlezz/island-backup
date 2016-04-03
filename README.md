@@ -10,7 +10,6 @@ Island Backup
 - 支持A岛 (http://h.nimingban.com/)
 - 支持kukuku (http://kukuku.cc/)
 - 自动备份图片
-- 自动分页  
 - 并发下载  
 - 使用aiohttp而非多线程
 
