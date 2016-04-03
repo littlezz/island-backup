@@ -11,22 +11,41 @@ from datetime import datetime
 
 ##########constant#########
 
-# CDNHOST = 'http://hacfun-tv.n1.yun.tf:8999/Public/Upload'
-CDNHOST = 'http://60.190.217.166:8999/Public/Upload'
+_island_info = {
+    'nimingban': {
+        'CDNHOST': 'http://60.190.217.166:8999/Public/Upload',
+        'headers': {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Dnt': '1',
+            'Host': 'hacfun-tv.n1.yun.tf:8999',
+            'Pragma': 'no-cache',
+            'Referer': 'http://h.nimingban.com/t/117617?page=10',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
+        }
 
+    },
+    'kukuku': {
+        'CDNHOST': 'http://static.koukuko.com/h',
+        'headers': {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Dnt': '1',
+            'Host': 'static.koukuko.com',
+            'Pragma': 'no-cache',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36'
+        }
 
-_headers = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, sdch',
-    'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Dnt': '1',
-    'Host': 'hacfun-tv.n1.yun.tf:8999',
-    'Pragma': 'no-cache',
-    'Referer': 'http://h.nimingban.com/t/117617?page=10',
-    'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'}
+    }
+}
+
 
 
 #########setup#########
@@ -36,6 +55,29 @@ session = aiohttp.ClientSession(connector=_conn)
 
 
 ################
+class IslandSwitcher:
+    available_island = ['nimingban', 'kukuku']
+
+    def __init__(self, island='nimingban'):
+        assert island in self.available_island
+        self.island = island
+
+    def detect_by_url(self, url):
+        for island in self.available_island:
+            if island in url:
+                self.island = island
+                return
+
+    @property
+    def cdn_host(self):
+        return _island_info[self.island]['CDNHOST']
+
+    @property
+    def headers(self):
+        return _island_info[self.island]['headers']
+
+
+island_switcher = IslandSwitcher()
 
 
 def template_render(name, **context):
@@ -86,7 +128,7 @@ class ImageManager:
         await self.sem.acquire()
         # print('enter downloading')
         task = asyncio.ensure_future(get_data(url, as_type='read',
-                                              headers=_headers,
+                                              headers=island_switcher.headers,
                                               callback=partial(self.save_file, file_path=file_path)))
         task.add_done_callback(lambda t: self.sem.release())
         task.add_done_callback(lambda t: self.busying.remove(url))
@@ -171,6 +213,7 @@ class Block:
         self._block = block_dict
 
     def __getattr__(self, item):
+        # property proxy for json data
         return self._block.get(item)
 
     def reply_to(self):
@@ -188,7 +231,7 @@ class Block:
         """
         if not self.image:
             return None
-        return ''.join((CDNHOST, self.image))
+        return ''.join((island_switcher.cdn_host, self.image))
 
     @property
     def created_time(self):
@@ -233,7 +276,6 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
     print('run!')
 
     all_blocks = []
-
     p = await Page.from_url(first_url, page_num=1)
     while True:
         print('page go')
@@ -241,7 +283,6 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         for block in thread_list:
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url))
-                # print(block.uid, block.image_url, block.reply_to() or None)
                 block.image = 'image/' + block.image.split('/')[-1]
         all_blocks.extend(thread_list)
 
@@ -261,13 +302,15 @@ def main():
     # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
     # first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
     first_url = sanitize_url(first_url)
-    folder_name = first_url.split('/')[-1]
+    island_switcher.detect_by_url(first_url)
+    folder_name = island_switcher.island + '_' + first_url.split('/')[-1]
 
     base_dir = os.path.join('backup', folder_name)
     image_dir = os.path.join(base_dir, 'image')
     os.makedirs(image_dir, exist_ok=True)
 
     print('first url is', first_url)
+    print('island is', island_switcher.island)
     loop = asyncio.get_event_loop()
     image_manager = ImageManager(image_dir, loop)
     loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
