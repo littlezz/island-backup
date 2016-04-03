@@ -67,6 +67,7 @@ class IslandSwitcher:
             if island in url:
                 self.island = island
                 return
+        raise ValueError('Unknown url: {}'.format(url))
 
     @property
     def cdn_host(self):
@@ -321,9 +322,18 @@ def main(url):
     session.close()
 
 
+def cli_url_verify(ctx, param, value):
+    if value is None:
+        return
+    if not any(i in value for i in IslandSwitcher.available_island):
+        session.close()
+        raise click.BadParameter('Unsupported url {}:'.format(value))
+    return value
+
+
 @click.command()
-@click.argument('url', required=False)
-@click.option('-u', prompt='Please Input Url')
+@click.argument('url', required=False, callback=cli_url_verify)
+@click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 def cli(url):
     main(url)
 
