@@ -7,6 +7,7 @@ import traceback
 from functools import partial
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
+import click
 
 
 ##########constant#########
@@ -26,8 +27,8 @@ _island_info = {
             'Referer': 'http://h.nimingban.com/t/117617?page=10',
             'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
-        }
 
+            }
     },
     'kukuku': {
         'CDNHOST': 'http://static.koukuko.com/h',
@@ -41,8 +42,7 @@ _island_info = {
             'Host': 'static.koukuko.com',
             'Pragma': 'no-cache',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36'
-        }
-
+            }
     }
 }
 
@@ -88,7 +88,6 @@ async def get_data(url, callback=None, as_type='json', headers=None):
     try:
         async with session.get(url, headers=headers) as r:
             data = await getattr(r, as_type)()
-            r.close()
     except Exception as e:
         print('exception!..', traceback.format_exc())
         data = ''
@@ -295,9 +294,13 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
     await image_manager.wait_all_task_done()
 
 
-def main():
 
-    first_url = input('url\n')
+
+
+
+def main(url):
+
+    first_url = url
     # first_url = 'http://h.nimingban.com/t/117617'
     # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
     # first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
@@ -315,7 +318,15 @@ def main():
     image_manager = ImageManager(image_dir, loop)
     loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
     loop.run_forever()
+    session.close()
+
+
+@click.command()
+@click.argument('url', required=False)
+@click.option('-u', prompt='Please Input Url')
+def cli(url):
+    main(url)
 
 
 if __name__ == '__main__':
-    main()
+    cli()
