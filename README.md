@@ -16,6 +16,11 @@ Island Backup
 
 使用方法
 -------
+
+下载程序  
+`git clone https://github.com/littlezz/island-backup`
+
+
 需要python >= 3.5  
 依赖库请查看requirements.txt  
 
