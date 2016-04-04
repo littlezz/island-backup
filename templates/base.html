@@ -63,7 +63,7 @@
                 <img src="{{ data.image }}" onclick="show_big(this)" data-big=0>
         </div>
         <div class="right-content">
-            <p><span>{{ data.created_time}}</span> <span>ID: {{ data.uid }}</span></p>
+            <p><span>{{ data.created_time}}</span> <span>ID: {{ data.uid }}</span> <span>No.{{ data.id }}</span></p>
             <p>{{ data.content }}</p>
         </div>
 
@@ -71,7 +71,9 @@
 {% endfor %}
 
 {% if page_obj %}
-{% include 'pages.html' %}
+    <div>
+        {% include 'pages.html' %}
+    </div>
 {% endif %}
 
 <script>
@@ -88,7 +90,6 @@
             id.dataset.big=0;
             id.style.cursor = 'zoom-out';
         }
-
     }
 </script>
 </body>
