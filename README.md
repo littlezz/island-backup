@@ -17,8 +17,11 @@ Island Backup
 使用方法
 -------
 
+
+###clone  
+
 下载程序  
-`git clone https://github.com/littlezz/island-backup`
+`git clone https://github.com/littlezz/island-backup`  
 
 
 需要python >= 3.5  
@@ -35,6 +38,13 @@ Island Backup
 python3 main.py  
 Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
 ```  
+
+###pip   
+使用`pip` 安装   
+
+    pip(3) install git+https://github.com/littlezz/island-backup
+    
+之后可以使用 `island_backup` 指令, 效果等同于替换 `python3 main.py`
 
 
 内容在backup文件夹里面.  
