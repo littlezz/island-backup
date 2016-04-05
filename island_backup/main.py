@@ -335,6 +335,7 @@ def cli_url_verify(ctx, param, value):
 @click.command()
 @click.argument('url', required=False, callback=cli_url_verify)
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
+@click.option('--debug', is_flag=True, help='enable debug mode')
 def cli(url):
     main(url)
 
