@@ -50,7 +50,7 @@ _island_info = {
 
 #########setup#########
 _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
-env = Environment(loader=FileSystemLoader('templates'), trim_blocks=True)
+env = Environment(loader=FileSystemLoader('island_backup/templates'), trim_blocks=True)
 session = aiohttp.ClientSession(connector=_conn)
 
 
