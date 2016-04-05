@@ -10,3 +10,4 @@ test.html
 
 .cache
 *.egg-info
+temp/
