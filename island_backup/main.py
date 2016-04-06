@@ -1,5 +1,4 @@
 import os
-
 import aiohttp
 import asyncio
 import re
@@ -8,6 +7,8 @@ from functools import partial
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import click
+import logging
+logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{')
 
 
 ##########constant#########
@@ -27,9 +28,8 @@ _island_info = {
             'Referer': 'http://h.nimingban.com/t/117617?page=10',
             'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
-
             }
-    },
+        },
     'kukuku': {
         'CDNHOST': 'http://static.koukuko.com/h',
         'headers': {
@@ -91,10 +91,10 @@ async def get_data(url, callback=None, as_type='json', headers=None):
         async with session.get(url, headers=headers) as r:
             data = await getattr(r, as_type)()
     except Exception as e:
-        print('exception!..', traceback.format_exc())
+        logging.ERROR('exception!.. %s', traceback.format_exc())
         data = ''
 
-    print('finish request', url)
+    logging.debug('finish request %s', url)
     if callback:
         asyncio.ensure_future(callback(data, url))
     else:
@@ -119,7 +119,7 @@ class ImageManager:
             return
         else:
             self.url_set.add(url)
-        print('prepare download', url)
+        logging.debug('prepare download %s', url)
         file_path = self.get_image_path(url)
 
         if os.path.exists(file_path):
@@ -127,7 +127,6 @@ class ImageManager:
 
         self.busying.add(url)
         await self.sem.acquire()
-        # print('enter downloading')
         task = asyncio.ensure_future(get_data(url, as_type='read',
                                               headers=island_switcher.headers,
                                               callback=partial(self.save_file, file_path=file_path)))
@@ -137,17 +136,16 @@ class ImageManager:
     async def save_file(self, data, url, file_path):
         content = data
         if not content:
-            print('no data available')
+            logging.debug('no data available')
             return
 
-        print('save file to ', file_path)
+        logging.debug('save file to %s', file_path)
 
         with open(file_path, 'wb') as f:
             f.write(content)
-        print('save success!')
 
     async def wait_all_task_done(self):
-        print('begin waiting')
+        logging.debug('begin waiting')
         while True:
             self.status_info()
             await asyncio.sleep(3)
@@ -274,12 +272,12 @@ def split_page_write(path, filename, blocks, page_num=50):
 
 
 async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None):
-    print('run!')
+    logging.info('run!')
 
     all_blocks = []
     p = await Page.from_url(first_url, page_num=1)
     while True:
-        print('page go')
+        logging.info('page on %s', p._page)
         thread_list = p.thread_list()
         for block in thread_list:
             if block.image_url:
@@ -314,8 +312,8 @@ def main(url):
     image_dir = os.path.join(base_dir, 'image')
     os.makedirs(image_dir, exist_ok=True)
 
-    print('first url is', first_url)
-    print('island is', island_switcher.island)
+    logging.info('url is %s', first_url)
+    logging.info('island is %s', island_switcher.island)
     loop = asyncio.get_event_loop()
     image_manager = ImageManager(image_dir, loop)
     loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
@@ -336,7 +334,9 @@ def cli_url_verify(ctx, param, value):
 @click.argument('url', required=False, callback=cli_url_verify)
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 @click.option('--debug', is_flag=True, help='enable debug mode')
-def cli(url):
+def cli(url, debug):
+    if debug:
+        logging.root.setLevel(logging.DEBUG)
     main(url)
 
 
