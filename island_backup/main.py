@@ -52,7 +52,7 @@ _island_info = {
 BASE = os.path.dirname(__file__)
 _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
 env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
-session = aiohttp.ClientSession(connector=_conn)
+
 
 
 ################
@@ -299,6 +299,9 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
 
 
 def main(url):
+
+    global session
+    session = aiohttp.ClientSession(connector=_conn)
 
     first_url = url
     # first_url = 'http://h.nimingban.com/t/117617'
