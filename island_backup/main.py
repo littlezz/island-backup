@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{'
 
 _island_info = {
     'nimingban': {
-        'CDNHOST': 'http://60.190.217.166:8999/Public/Upload',
+        'CDNHOST': 'http://img1.nimingban.com',
         'headers': {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, sdch',
