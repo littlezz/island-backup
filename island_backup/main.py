@@ -23,7 +23,7 @@ _island_info = {
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive',
             'Dnt': '1',
-            'Host': 'hacfun-tv.n1.yun.tf:8999',
+            'Host': 'img1.nimingban.com',
             'Pragma': 'no-cache',
             'Referer': 'http://h.nimingban.com/t/117617?page=10',
             'Upgrade-Insecure-Requests': '1',
