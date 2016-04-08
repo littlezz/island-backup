@@ -110,7 +110,7 @@ class ImageManager:
         self.busying = set()
         self.loop = loop
         self.image_dir = image_dir
-        self.pdbar = tqdm(desc='image downloading...')
+        self.pdbar = tqdm(desc='image downloading...', position=1)
         # force update image
         self.force_update = force_update
 
@@ -209,7 +209,11 @@ class Page:
         return self.base_url, page_num
 
     def has_next(self):
-        return self._page < self.data['page']['size']
+        return self._page < self.total_page
+
+    @property
+    def total_page(self):
+        return self.data['page']['size']
 
 
 class Block:
@@ -279,12 +283,14 @@ def split_page_write(path, filename, blocks, page_num=50):
 
 
 async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None):
-    logging.info('run!')
+    # logging.info('run!')
 
     all_blocks = []
     p = await Page.from_url(first_url, page_num=1)
+    process_bar = tqdm(total=p.total_page, position=0, desc='page scanning')
+    process_bar.update()
     while True:
-        logging.info('page on %s', p._page)
+        # logging.info('page on %s', p._page)
         thread_list = p.thread_list()
         for block in thread_list:
             if block.image_url:
@@ -294,11 +300,13 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
 
         if p.has_next():
             p = await Page.from_url(*p.next_page_info)
+            process_bar.update()
         else:
             break
 
     split_page_write(path=base_dir, filename=folder_name, blocks=all_blocks, page_num=50)
     await image_manager.wait_all_task_done()
+    process_bar.close()
 
 
 
