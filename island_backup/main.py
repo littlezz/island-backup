@@ -7,6 +7,7 @@ from functools import partial
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import click
+from tqdm import tqdm
 import logging
 from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{')
@@ -103,12 +104,15 @@ async def get_data(url, callback=None, as_type='json', headers=None):
 
 
 class ImageManager:
-    def __init__(self, image_dir, loop, max_tasks=150):
+    def __init__(self, image_dir, loop, max_tasks=150, force_update=False):
         self.url_set = set()
         self.sem = asyncio.Semaphore(max_tasks)
         self.busying = set()
         self.loop = loop
         self.image_dir = image_dir
+        self.pdbar = tqdm(desc='image downloading...')
+        # force update image
+        self.force_update = force_update
 
     def get_image_path(self, url):
         file_name = url.split('/')[-1]
@@ -123,7 +127,7 @@ class ImageManager:
         logging.debug('prepare download %s', url)
         file_path = self.get_image_path(url)
 
-        if os.path.exists(file_path):
+        if not self.force_update and os.path.exists(file_path):
             return
 
         self.busying.add(url)
@@ -133,6 +137,7 @@ class ImageManager:
                                               callback=partial(self.save_file, file_path=file_path)))
         task.add_done_callback(lambda t: self.sem.release())
         task.add_done_callback(lambda t: self.busying.remove(url))
+        task.add_done_callback(lambda t: self.status_info())
 
     async def save_file(self, data, url, file_path):
         content = data
@@ -148,7 +153,6 @@ class ImageManager:
     async def wait_all_task_done(self):
         logging.debug('begin waiting')
         while True:
-            self.status_info()
             await asyncio.sleep(3)
             if not self.busying:
                 break
@@ -156,14 +160,16 @@ class ImageManager:
         self.loop.stop()
 
     def status_info(self):
-        print('this is {} in busying'.format(len(self.busying)))
+        self.pdbar.update()
+
+        logging.debug('this is {} in busying'.format(len(self.busying)))
         urls = []
         for i, url in enumerate(self.busying):
             if i >= 3:
                 break
             urls.append(url)
 
-        print('urls[3] is', urls)
+        logging.debug('urls[3] is %s', urls)
 
 
 def url_page_combine(base_url, num):
@@ -299,7 +305,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
 
 
 
-def main(url):
+def main(url, force_update):
 
     global session
     session = aiohttp.ClientSession(connector=_conn)
@@ -319,7 +325,7 @@ def main(url):
     logging.info('url is %s', first_url)
     logging.info('island is %s', island_switcher.island)
     loop = asyncio.get_event_loop()
-    image_manager = ImageManager(image_dir, loop)
+    image_manager = ImageManager(image_dir, loop, force_update=force_update)
     loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
     loop.run_forever()
     session.close()
@@ -338,11 +344,12 @@ def cli_url_verify(ctx, param, value):
 @click.argument('url', required=False, callback=cli_url_verify)
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 @click.option('--debug', is_flag=True, help='enable debug mode')
+@click.option('--force-update', is_flag=True, help='force update image')
 @click.version_option(version=__version__)
-def cli(url, debug):
+def cli(url, debug, force_update):
     if debug:
         logging.root.setLevel(logging.DEBUG)
-    main(url)
+    main(url, force_update)
 
 
 if __name__ == '__main__':
