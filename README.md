@@ -56,3 +56,5 @@ Screenshot
 --------
 ![](/screenshot/html-preview.png)
 
+![](/screenshot/shell.png)
+
