@@ -8,6 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import click
 import logging
+from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{')
 
 
@@ -337,6 +338,7 @@ def cli_url_verify(ctx, param, value):
 @click.argument('url', required=False, callback=cli_url_verify)
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 @click.option('--debug', is_flag=True, help='enable debug mode')
+@click.version_option(version=__version__)
 def cli(url, debug):
     if debug:
         logging.root.setLevel(logging.DEBUG)
