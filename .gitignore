@@ -11,3 +11,7 @@ test.html
 .cache
 *.egg-info
 temp/
+
+dist/
+build/
+*.spec
