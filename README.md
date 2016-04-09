@@ -16,7 +16,9 @@ Island Backup
 安装
 -------
 ###windows用户  
-可以下载编译好的二进制包
+可以下载编译好的二进制包  
+
+https://github.com/littlezz/island-backup/releases
 
 
 
