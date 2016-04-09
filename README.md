@@ -13,31 +13,24 @@ Island Backup
 - 并发下载  
 - 使用aiohttp而非多线程
 
-
-使用方法
+安装
 -------
+###windows用户  
+可以下载编译好的二进制包
+
 
 
 ###clone  
 
-下载程序  
-`git clone https://github.com/littlezz/island-backup`  
-
-
 需要python >= 3.5  
 依赖库请查看requirements.txt  
 
+下载程序  
+`git clone https://github.com/littlezz/island-backup`  
 
-输入 url , 目前兹瓷 h.nimingban.com 和 kukuku.cc 的串  
+安装依赖
+`pip(3) install -r requirements.txt`
 
-`python3 main.py http://h.nimingban.com/t/6048436?r=6048436`  
-
-或者
-
-```shell
-python3 main.py  
-Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
-```  
 
 ###pip   
 
@@ -45,11 +38,43 @@ Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
 
     pip(3) install git+https://github.com/littlezz/island-backup
     
-之后可以使用 `island_backup` 指令, 效果等同于替换 `python3 main.py`
+之后可以使用 `island_backup` 指令
 
 
+使用方法
+--------
+
+###windows
+windows 用户运行island_backup.exe 文件.
+输入 url , 目前兹瓷 h.nimingban.com 和 kukuku.cc 的串  
+
+```shell
+Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
+```  
 
 内容在backup文件夹里面.  
+
+###Mac && Linux
+推荐使用 pip 安装, 之后可以使用`island_backup`, 会在当前目录下生成backup文件夹.  
+
+`island_backup http://h.nimingban.com/t/6048436?r=6048436`  
+
+使用`island_backup --help` 查看所有支持的指令  
+
+
+```shell
+
+⇒  island_backup --help
+Usage: island_backup [OPTIONS] [URL]
+
+Options:
+  -url TEXT
+  --debug         enable debug mode
+  --force-update  force update image
+  --version       Show the version and exit.
+  --help          Show this message and exit.  
+ 
+```
 
 
 Screenshot
