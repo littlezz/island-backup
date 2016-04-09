@@ -63,7 +63,6 @@ _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
 env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
 
 
-
 ################
 class IslandSwitcher:
     available_island = ['nimingban', 'kukuku']
@@ -316,10 +315,6 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
     process_bar.close()
 
 
-
-
-
-
 def start(url, force_update):
 
     global session
@@ -367,6 +362,7 @@ def cli(url, debug, force_update):
 
     if bundle_env:
         input('Press any key to exit')
+
 
 if __name__ == '__main__':
     cli()
