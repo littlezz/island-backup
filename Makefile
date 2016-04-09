@@ -10,4 +10,4 @@ version:
 bundle:
 	pyinstaller -n island_backup cli.py -y
 	cp -r island_backup/templates dist/island_backup/
-	cd dist/; tar -zcvf $(name).tar.gz island_backup/
+	cd dist/; tar -zcvf $(name).tar.gz  -C island_backup/ .
