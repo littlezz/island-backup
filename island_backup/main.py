@@ -1,4 +1,5 @@
 import os
+import sys
 import aiohttp
 import asyncio
 import re
@@ -51,9 +52,15 @@ _island_info = {
 
 
 #########setup#########
-BASE = os.path.dirname(__file__)
+bundle_env = getattr(sys, 'frozen', False)
+
+if bundle_env:
+    BASE = os.path.dirname(sys._MEIPASS)
+else:
+    BASE = os.path.dirname(__file__)
+
 _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
-env = Environment(loader=FileSystemLoader(os.path.join('.', 'templates')), trim_blocks=True)
+env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
 
 
 
@@ -313,7 +320,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
 
 
 
-def main(url, force_update):
+def start(url, force_update):
 
     global session
     session = aiohttp.ClientSession(connector=_conn)
@@ -356,8 +363,10 @@ def cli_url_verify(ctx, param, value):
 def cli(url, debug, force_update):
     if debug:
         logging.root.setLevel(logging.DEBUG)
-    main(url, force_update)
+    start(url, force_update)
 
+    if bundle_env:
+        input('Press any key to exit')
 
 if __name__ == '__main__':
     cli()
