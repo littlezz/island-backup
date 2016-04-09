@@ -55,7 +55,7 @@ _island_info = {
 bundle_env = getattr(sys, 'frozen', False)
 
 if bundle_env:
-    BASE = os.path.dirname(sys._MEIPASS)
+    BASE = sys._MEIPASS
 else:
     BASE = os.path.dirname(__file__)
 
