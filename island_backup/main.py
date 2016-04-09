@@ -343,7 +343,6 @@ def cli_url_verify(ctx, param, value):
     if value is None:
         return
     if not any(i in value for i in IslandSwitcher.available_island):
-        session.close()
         raise click.BadParameter('Unsupported url {}:'.format(value))
     return value
 
