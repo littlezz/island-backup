@@ -38,7 +38,7 @@ https://github.com/littlezz/island-backup/releases
 
 使用`pip` 安装   
 
-    pip(3) install git+https://github.com/littlezz/island-backup
+    pip(3) install island-backup
     
 之后可以使用 `island_backup` 指令
 
@@ -78,10 +78,12 @@ Options:
  
 ```
 
+![](/screenshot/shell.png)
+
+
 
 Screenshot
 --------
 ![](/screenshot/html-preview.png)
 
-![](/screenshot/shell.png)
 
