@@ -66,15 +66,16 @@ Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
 
 ```shell
 
-⇒  island_backup --help
+⇒  island_backup --help                    
 Usage: island_backup [OPTIONS] [URL]
 
 Options:
   -url TEXT
-  --debug         enable debug mode
-  --force-update  force update image
-  --version       Show the version and exit.
-  --help          Show this message and exit.  
+  --debug                     enable debug mode
+  --force-update              force update image
+  --conn-count INTEGER RANGE  conn number connector use. from 1 to 20.
+  --version                   Show the version and exit.
+  --help                      Show this message and exit.
  
 ```
 
