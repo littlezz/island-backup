@@ -59,7 +59,7 @@ if bundle_env:
 else:
     BASE = os.path.dirname(__file__)
 
-_conn = aiohttp.TCPConnector(use_dns_cache=True, limit=10, conn_timeout=60)
+
 env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
 
 
@@ -315,7 +315,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
     process_bar.close()
 
 
-def start(url, force_update):
+def start(url, force_update, _conn):
 
     global session
     session = aiohttp.ClientSession(connector=_conn)
@@ -354,11 +354,16 @@ def cli_url_verify(ctx, param, value):
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 @click.option('--debug', is_flag=True, help='enable debug mode')
 @click.option('--force-update', is_flag=True, help='force update image')
+@click.option('--conn-count', type=click.IntRange(1, 20), help='conn number connector use. from 1 to 20.')
 @click.version_option(version=__version__)
-def cli(url, debug, force_update):
+def cli(url, debug, force_update, conn_count):
     if debug:
         logging.root.setLevel(logging.DEBUG)
-    start(url, force_update)
+
+    logging.info('conn number is %s', conn_count)
+
+    _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=conn_count, conn_timeout=60)
+    start(url, force_update, _conn)
 
     if bundle_env:
         input('Press any key to exit')
