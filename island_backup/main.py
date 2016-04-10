@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{'
 
 ##########constant#########
 
+
 _island_info = {
     'nimingban': {
         'CDNHOST': 'http://img1.nimingban.com',
@@ -52,6 +53,8 @@ _island_info = {
 
 
 #########setup#########
+
+
 bundle_env = getattr(sys, 'frozen', False)
 
 if bundle_env:
@@ -64,6 +67,8 @@ env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim
 
 
 ################
+
+
 class IslandSwitcher:
     available_island = ['nimingban', 'kukuku']
 
@@ -141,6 +146,7 @@ class ImageManager:
         task = asyncio.ensure_future(get_data(url, as_type='read',
                                               headers=island_switcher.headers,
                                               callback=partial(self.save_file, file_path=file_path)))
+
         task.add_done_callback(lambda t: self.sem.release())
         task.add_done_callback(lambda t: self.busying.remove(url))
         task.add_done_callback(lambda t: self.status_info())
@@ -162,7 +168,6 @@ class ImageManager:
             await asyncio.sleep(3)
             if not self.busying:
                 break
-
         self.loop.stop()
 
     def status_info(self):
@@ -289,14 +294,11 @@ def split_page_write(path, filename, blocks, page_num=50):
 
 
 async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None):
-    # logging.info('run!')
-
     all_blocks = []
     p = await Page.from_url(first_url, page_num=1)
     process_bar = tqdm(total=p.total_page, position=0, desc='page scanning')
     process_bar.update()
     while True:
-        # logging.info('page on %s', p._page)
         thread_list = p.thread_list()
         for block in thread_list:
             if block.image_url:
