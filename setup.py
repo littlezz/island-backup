@@ -15,7 +15,7 @@ setup(
     description="backup h.nimingban and kukuku.cc",
     long_description=readme,
     classifiers=[
-        'Development Status:: 3 - Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3 :: Only',
