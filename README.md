@@ -1,12 +1,16 @@
 Island Backup
-==============
+=============
+![author](https://img.shields.io/badge/Author-littlezz-blue.svg)
+![pypi status](https://img.shields.io/pypi/pyversions/island-backup.svg)
+
+
 以 `aiohttp` `asyncio` 为主编写的备份程序  
 
 备份匿名版上的串, 图片到本地, 以html形式查看  
 
 
 特性
------
+---
 - 支持A岛 (http://h.nimingban.com/)
 - 支持kukuku (http://kukuku.cc/)
 - 自动备份图片
@@ -14,7 +18,7 @@ Island Backup
 - 使用aiohttp而非多线程
 
 安装
--------
+---
 ###windows用户  
 可以下载编译好的二进制包  
 
@@ -44,7 +48,7 @@ https://github.com/littlezz/island-backup/releases
 
 
 使用方法
---------
+------
 
 ###windows
 windows 用户运行island_backup.exe 文件.
@@ -84,7 +88,7 @@ Options:
 
 
 Screenshot
---------
+----------
 ![](/screenshot/html-preview.png)
 
 
