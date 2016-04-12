@@ -1,8 +1,8 @@
 Island Backup
 =============
 ![author](https://img.shields.io/badge/Author-littlezz-blue.svg)
-![pypi status](https://img.shields.io/pypi/pyversions/island-backup.svg)
-
+![py version](https://img.shields.io/pypi/pyversions/island-backup.svg)
+![pypi status](https://img.shields.io/pypi/v/island-backup.svg)
 
 以 `aiohttp` `asyncio` 为主编写的备份程序  
 
