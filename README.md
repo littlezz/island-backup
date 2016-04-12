@@ -3,6 +3,7 @@ Island Backup
 ![author](https://img.shields.io/badge/Author-littlezz-blue.svg)
 ![py version](https://img.shields.io/pypi/pyversions/island-backup.svg)
 ![pypi status](https://img.shields.io/pypi/v/island-backup.svg)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)]()
 
 以 `aiohttp` `asyncio` 为主编写的备份程序  
 
