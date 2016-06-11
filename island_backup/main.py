@@ -352,12 +352,23 @@ def cli_url_verify(ctx, param, value):
     return value
 
 
+def parse_ipaddress(ctx, param, value):
+    host_port = value.split(':')
+    host = host_port[0]
+    if len(host_port) == 2:
+        port = host_port[1]
+    else:
+        port = None
+    return (host, port)
+
+
 @click.command()
 @click.argument('url', required=False, callback=cli_url_verify)
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 @click.option('--debug', is_flag=True, help='enable debug mode')
 @click.option('--force-update', is_flag=True, help='force update image')
 @click.option('--conn-count', type=click.IntRange(1, 20), help='conn number connector use. from 1 to 20.')
+@click.option('--proxy', '-p', callback=parse_ipaddress, help='socks proxy address, ex, 127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count):
     if debug:
