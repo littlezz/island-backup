@@ -10,6 +10,7 @@ from datetime import datetime
 import click
 from tqdm import tqdm
 import logging
+import aiosocks
 from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{')
 
