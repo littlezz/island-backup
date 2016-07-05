@@ -71,14 +71,16 @@ Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
 
 ```shell
 
-⇒  island_backup --help                    
+⇒  island_backup --help                                                                                                                             (env: island_backup) 
 Usage: island_backup [OPTIONS] [URL]
 
 Options:
   -url TEXT
   --debug                     enable debug mode
   --force-update              force update image
-  --conn-count INTEGER RANGE  conn number connector use. from 1 to 20.
+  --conn-count INTEGER RANGE  max conn number connector use. from 1 to 20.
+                              Default is no limit
+  -p, --proxy TEXT            socks proxy address, ex, 127.0.0.1:1080
   --version                   Show the version and exit.
   --help                      Show this message and exit.
  
