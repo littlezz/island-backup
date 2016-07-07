@@ -13,7 +13,7 @@ Island Backup
 特性
 ---
 - 支持A岛 (http://h.nimingban.com/)
-- 支持kukuku (http://kukuku.cc/)
+- ~~支持kukuku (http://kukuku.cc/)~~
 - 自动备份图片
 - 并发下载  
 - 使用aiohttp而非多线程
