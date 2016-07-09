@@ -13,7 +13,7 @@ import logging
 import aiosocks
 from aiosocks.connector import SocksConnector
 from . import version as __version__
-logging.basicConfig(level=logging.INFO, format='{asctime}: {message}', style='{')
+logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
 
 ##########constant#########
@@ -106,7 +106,7 @@ async def get_data(url, callback=None, as_type='json', headers=None):
         async with session.get(url, headers=headers) as r:
             data = await getattr(r, as_type)()
     except Exception as e:
-        logging.ERROR('exception!.. %s', traceback.format_exc())
+        logging.error('Ignore Error:....\n%s\n...end', traceback.format_exc())
         data = ''
 
     logging.debug('finish request %s', url)
@@ -374,6 +374,7 @@ def parse_ipaddress(ctx, param, value):
 def cli(url, debug, force_update, conn_count, proxy):
     if debug:
         logging.root.setLevel(logging.DEBUG)
+        asyncio.get_event_loop().set_debug(True)
 
     logging.info('conn number is %s', conn_count)
     logging.info('proxy is %s', proxy)
