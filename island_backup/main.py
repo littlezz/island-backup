@@ -68,6 +68,8 @@ else:
 env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
 
 
+EMPTY_DATA = object()
+
 ################
 
 
@@ -105,15 +107,16 @@ async def get_data(url, callback=None, as_type='json', headers=None):
     try:
         async with session.get(url, headers=headers) as r:
             data = await getattr(r, as_type)()
-    except Exception as e:
-        logging.error('Ignore Error:....\n%s\n...end', traceback.format_exc())
-        data = ''
 
-    logging.debug('finish request %s', url)
-    if callback:
-        asyncio.ensure_future(callback(data, url))
+    except Exception:
+        logging.error('Ignore Error:....\n%s\n...end', traceback.format_exc())
+        return EMPTY_DATA
     else:
-        return data
+        logging.debug('finish request %s', url)
+        if callback:
+            asyncio.ensure_future(callback(data, url))
+        else:
+            return data
 
 
 class ImageManager:
@@ -321,9 +324,6 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
 
 def start(url, force_update, _conn):
 
-    global session
-    session = aiohttp.ClientSession(connector=_conn)
-
     first_url = url
     # first_url = 'http://h.nimingban.com/t/117617'
     # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
@@ -342,7 +342,14 @@ def start(url, force_update, _conn):
     image_manager = ImageManager(image_dir, loop, force_update=force_update)
     loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
     loop.run_forever()
-    session.close()
+
+
+async def verify_proxy():
+    url = 'https://api.github.com/users/littlezz'
+    async with session.get(url) as r:
+        status = r.status
+        logging.info('test proxy status, [{}]'.format(status))
+        assert r.status == 200
 
 
 def cli_url_verify(ctx, param, value):
@@ -387,15 +394,29 @@ def cli(url, debug, force_update, conn_count, proxy):
 
 
     if not proxy:
-        # _conn = aiohttp.TCPConnector(use_dns_cache=True, limit=conn_count, conn_timeout=60)
         _conn = aiohttp.TCPConnector(**conn_kwargs)
     else:
         _conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
 
-    start(url, force_update, _conn)
+    global session
+    session = aiohttp.ClientSession(connector=_conn)
 
-    if bundle_env:
-        input('Press any key to exit')
+    try:
+        try:
+            if proxy:
+                logging.info('Test whether proxy config is correct')
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(verify_proxy())
+        except (aiohttp.errors.ProxyConnectionError, ConnectionRefusedError, AssertionError) as e:
+            print('Proxy config is wrong!\n {}'.format(e))
+
+        else:
+            start(url, force_update, _conn)
+
+    finally:
+        session.close()
+        if bundle_env:
+            input('Press any key to exit')
 
 
 if __name__ == '__main__':
