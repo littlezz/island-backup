@@ -361,6 +361,8 @@ def cli_url_verify(ctx, param, value):
 
 
 def parse_ipaddress(ctx, param, value):
+    if value is None:
+        return
     host_port = value.split(':')
     host = host_port[0]
     if len(host_port) == 2:
