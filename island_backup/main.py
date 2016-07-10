@@ -322,7 +322,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
     process_bar.close()
 
 
-def start(url, force_update, _conn):
+def start(url, force_update):
 
     first_url = url
     # first_url = 'http://h.nimingban.com/t/117617'
@@ -367,7 +367,7 @@ def parse_ipaddress(ctx, param, value):
         port = host_port[1]
     else:
         port = None
-    return (host, port)
+    return host, port
 
 
 @click.command()
