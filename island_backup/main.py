@@ -381,6 +381,7 @@ def parse_ipaddress(ctx, param, value):
 @click.option('--proxy', '-p', required=False, callback=parse_ipaddress, help='socks proxy address, ex, 127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
+    click.echo(__version__)
     if debug:
         logging.root.setLevel(logging.DEBUG)
         asyncio.get_event_loop().set_debug(True)
@@ -413,7 +414,7 @@ def cli(url, debug, force_update, conn_count, proxy):
             print('Proxy config is wrong!\n {}'.format(e))
 
         else:
-            start(url, force_update, _conn)
+            start(url, force_update)
 
     finally:
         session.close()
