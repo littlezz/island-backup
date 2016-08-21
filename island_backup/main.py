@@ -103,20 +103,28 @@ def template_render(name, **context):
     return env.get_template(name).render(**context)
 
 
-async def get_data(url, callback=None, as_type='json', headers=None):
-    try:
-        async with session.get(url, headers=headers) as r:
-            data = await getattr(r, as_type)()
-
-    except Exception:
-        logging.error('Ignore Error:....\n%s\n...end', traceback.format_exc())
-        return EMPTY_DATA
-    else:
-        logging.debug('finish request %s', url)
-        if callback:
-            asyncio.ensure_future(callback(data, url))
+async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
+    while retry > 0:
+        try:
+            async with session.get(url, headers=headers) as r:
+                try:
+                    data = await getattr(r, as_type)()
+                except:
+                    print('??')
+        except:
+            retry -= 1
+            logging.debug('url: %s retry %s', url, retry)
         else:
-            return data
+            break
+    else:
+        # logging.error('Ignore Error:....\n%s\n...end', traceback.format_exc())
+        return EMPTY_DATA
+
+    logging.debug('finish request %s', url)
+    if callback:
+        asyncio.ensure_future(callback(data, url))
+    else:
+        return data
 
 
 class ImageManager:
@@ -413,7 +421,7 @@ def cli(url, debug, force_update, conn_count, proxy):
             print('Proxy config is wrong!\n {}'.format(e))
 
         else:
-            start(url, force_update, _conn)
+            start(url, force_update)
 
     finally:
         session.close()
