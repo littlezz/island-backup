@@ -73,8 +73,6 @@ env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim
 
 EMPTY_DATA = object()
 
-global session
-
 
 ################
 # main
@@ -426,7 +424,7 @@ def cli(url, debug, force_update, conn_count, proxy):
     else:
         _conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
 
-
+    global session
     session = aiohttp.ClientSession(connector=_conn)
 
     try:
