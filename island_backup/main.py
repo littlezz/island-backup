@@ -16,7 +16,9 @@ from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
 
-##########constant#########
+##########
+# constant
+##########
 
 
 _island_info = {
@@ -53,8 +55,9 @@ _island_info = {
 }
 
 
-
-#########setup#########
+##########
+# setup
+##########
 
 
 bundle_env = getattr(sys, 'frozen', False)
@@ -70,6 +73,11 @@ env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim
 
 EMPTY_DATA = object()
 
+global session
+
+
+################
+# main
 ################
 
 
@@ -104,20 +112,25 @@ def template_render(name, **context):
 
 
 async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
-    while retry > 0:
+    _retry = 0
+    _base = 2
+    _log_error = None
+
+    while _retry < retry:
         try:
             async with session.get(url, headers=headers) as r:
-                try:
-                    data = await getattr(r, as_type)()
-                except:
-                    print('??')
+                data = await getattr(r, as_type)()
         except:
-            retry -= 1
-            logging.debug('url: %s retry %s', url, retry)
+            # sleep 0s, 1s, 3s
+            await asyncio.sleep(_base**_retry - 1)
+            _retry += 1
+            logging.debug('url: %s retry %s', url, _retry)
+            _log_error = traceback.format_exc()
         else:
             break
     else:
-        # logging.error('Ignore Error:....\n%s\n...end', traceback.format_exc())
+        logging.error('\n Ignore Error:....\n%s\n...end\n', _log_error)
+        print('Empyt data')
         return EMPTY_DATA
 
     logging.debug('finish request %s', url)
@@ -209,6 +222,10 @@ class Page:
     @classmethod
     async def from_url(cls, base_url, page_num):
         data = await get_data(url_page_combine(base_url, page_num))
+        if data is EMPTY_DATA:
+            asyncio.get_event_loop().stop()
+
+            exit('\nGot Connection Error!')
         return cls(base_url, page_num, data)
 
     def thread_list(self):
@@ -389,7 +406,8 @@ def parse_ipaddress(ctx, param, value):
 @click.option('--proxy', '-p', required=False, callback=parse_ipaddress, help='socks proxy address, ex, 127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
-    click.echo(__version__)
+    click.echo('version: {}'.format(__version__))
+
     if debug:
         logging.root.setLevel(logging.DEBUG)
         asyncio.get_event_loop().set_debug(True)
@@ -403,13 +421,12 @@ def cli(url, debug, force_update, conn_count, proxy):
         conn_timeout=60
     )
 
-
     if not proxy:
         _conn = aiohttp.TCPConnector(**conn_kwargs)
     else:
         _conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
 
-    global session
+
     session = aiohttp.ClientSession(connector=_conn)
 
     try:
