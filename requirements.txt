@@ -5,3 +5,5 @@ click
 tqdm
 docopt
 aiosocks
+pytest
+pytest-asyncio
