@@ -95,3 +95,6 @@ Screenshot
 ![](/screenshot/html-preview.png)
 
 
+Changelog
+---------
+- v1.3 支持备胎岛 2016-09-02
