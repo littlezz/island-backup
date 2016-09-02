@@ -51,6 +51,22 @@ _island_info = {
             'Pragma': 'no-cache',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36'
             }
+    },
+    'adnmb': {
+        'CDNHOST': 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload',
+        'headers': {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Dnt': '1',
+            'Host': 'h-adnmb-com.n1.yun.tf:8999',
+            'Pragma': 'no-cache',
+            'Referer': 'http://h.adnmb.com/',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+        }
     }
 }
 
@@ -80,7 +96,7 @@ EMPTY_DATA = object()
 
 
 class IslandSwitcher:
-    available_island = ['nimingban', 'kukuku']
+    available_island = ['nimingban', 'kukuku', 'adnmb']
 
     def __init__(self, island='nimingban'):
         assert island in self.available_island
