@@ -283,6 +283,22 @@ class Block:
         # property proxy for json data
         return self._block.get(item)
 
+    @property
+    def id(self):
+        return self._block.get('id')
+
+    @property
+    def uid(self):
+        return self._block.get('uid')
+
+    @property
+    def content(self):
+        return self._block.get('content')
+
+    @property
+    def image(self):
+        return self._block.get('image')
+
     def reply_to(self):
         """
         解析里面回复的id, 返回ids
