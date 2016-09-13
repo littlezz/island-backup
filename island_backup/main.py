@@ -89,6 +89,8 @@ env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim
 
 EMPTY_DATA = object()
 
+session = aiohttp.ClientSession()
+
 
 ################
 # main
