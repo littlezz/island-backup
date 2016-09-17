@@ -89,7 +89,7 @@ env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim
 
 EMPTY_DATA = object()
 
-session = aiohttp.ClientSession()
+session = None
 
 
 ################
@@ -295,9 +295,6 @@ class Block:
     def content(self):
         return self._block.get('content')
 
-    @property
-    def image(self):
-        return self._block.get('image')
 
     def reply_to(self):
         """
@@ -365,6 +362,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         for block in thread_list:
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url))
+                # TODO: change this name to local_image
                 block.image = 'image/' + block.image.split('/')[-1]
         all_blocks.extend(thread_list)
 

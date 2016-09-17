@@ -1,13 +1,17 @@
 import pytest
+from island_backup import main
 from island_backup.main import Page, island_switcher
 import asyncio
+import aiohttp
 
 from tests.basetest import *
 
 
 async def prepare_page():
+    main.session = aiohttp.ClientSession()
     island_switcher.detect_by_url('http://h.adnmb.com/api/t/106983')
     p = await Page.from_url('http://h.adnmb.com/api/t/106983', page_num=1)
+    main.session.close()
     return p
 
 
@@ -23,6 +27,20 @@ class TestAdnmb(BaseTest):
     BLOCK_0_IMAGE_URL = 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57372d96e74c2.jpg'
     BLOCK_1_IMAGE_URL = None
     THREAD_LIST_NUM = 21
+    BLOCK_0_DATA = {
+        'image_url': 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57372d96e74c2.jpg',
+        'uid': 'W0wrx3S',
+        'id': '106983',
+        'content': """|∀ﾟ有广东的肥肥吗，我好想买，可惜我这里暂时没有""",
+        'created_time': '2016-05-14 21:52:23'
+    }
+    BLOCK_1_DATA = {
+        'image_url': None,
+        'uid': 'dPRC8y8',
+        'content': """大吃人在此，不过我用的是移动| ω・´)""",
+        'id': '106987',
+        'created_time': '2016-05-14 21:56:00',
+    }
 
 
     def test_another_block(self, page):

@@ -1,8 +1,15 @@
+
+
+def check_block(block, data_dict):
+    check_key = ['uid', 'id', 'content', 'image_url', 'created_time']
+    for key in check_key:
+        assert getattr(block, key) == data_dict[key]
+
 class BaseTest:
     NEXT_PAGE_INFO = None
     THREAD_LIST_NUM = 20
-    BLOCK_0_IMAGE_URL = None
-    BLOCK_1_IMAGE_URL = None
+    BLOCK_0_DATA = None
+    BLOCK_1_DATA = None
 
     def test_page(self, page):
         assert page.has_next()
@@ -17,8 +24,11 @@ class BaseTest:
 
     def test_first_block(self, page):
         block = page.thread_list()[0]
-        assert block.image_url == self.BLOCK_0_IMAGE_URL
+        check_block(block, self.BLOCK_0_DATA)
 
     def test_second_block(self, page):
         block = page.thread_list()[1]
-        assert block.image_url == self.BLOCK_1_IMAGE_URL
+        check_block(block, self.BLOCK_1_DATA)
+
+    def test_another_block(self, page):
+        raise NotImplementedError
