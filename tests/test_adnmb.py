@@ -10,8 +10,6 @@ from tests.basetest import *
 class TestAdnmb(BaseTest):
     API_URL = 'http://h.adnmb.com/api/t/106983'
     NEXT_PAGE_INFO = ('http://h.adnmb.com/api/t/106983', 2)
-    BLOCK_0_IMAGE_URL = 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57372d96e74c2.jpg'
-    BLOCK_1_IMAGE_URL = None
     THREAD_LIST_NUM = 21
     BLOCK_0_DATA = {
         'image_url': 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57372d96e74c2.jpg',
