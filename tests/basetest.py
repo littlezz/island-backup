@@ -1,3 +1,16 @@
+from island_backup import main
+from island_backup.main import island_switcher, Page
+import aiohttp
+
+
+class BasePreparePage:
+    API_URL = None
+    async def get_page(self):
+        main.session = aiohttp.ClientSession()
+        island_switcher.detect_by_url(self.API_URL)
+        p = await Page.from_url(self.API_URL, page_num=1)
+        main.session.close()
+        return p
 
 
 def check_block(block, data_dict):

@@ -1,23 +1,16 @@
 import pytest
-from island_backup import main
-from island_backup.main import Page, island_switcher
 import asyncio
-import aiohttp
 
 from tests.basetest import *
 
 
-async def prepare_page():
-    main.session = aiohttp.ClientSession()
-    island_switcher.detect_by_url('http://h.adnmb.com/api/t/106983')
-    p = await Page.from_url('http://h.adnmb.com/api/t/106983', page_num=1)
-    main.session.close()
-    return p
+class PreparePage(BasePreparePage):
+    API_URL = 'http://h.adnmb.com/api/t/106983'
 
 
 @pytest.fixture(scope='module')
 def page():
-    p = asyncio.get_event_loop().run_until_complete(prepare_page())
+    p = asyncio.get_event_loop().run_until_complete(PreparePage().get_page())
     return p
 
 
