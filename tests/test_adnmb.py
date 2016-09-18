@@ -4,18 +4,11 @@ import asyncio
 from tests.basetest import *
 
 
-class PreparePage(BasePreparePage):
-    API_URL = 'http://h.adnmb.com/api/t/106983'
-
-
-@pytest.fixture(scope='module')
-def page():
-    p = asyncio.get_event_loop().run_until_complete(PreparePage().get_page())
-    return p
 
 
 
 class TestAdnmb(BaseTest):
+    API_URL = 'http://h.adnmb.com/api/t/106983'
     NEXT_PAGE_INFO = ('http://h.adnmb.com/api/t/106983', 2)
     BLOCK_0_IMAGE_URL = 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57372d96e74c2.jpg'
     BLOCK_1_IMAGE_URL = None
@@ -36,8 +29,8 @@ class TestAdnmb(BaseTest):
     }
 
 
-    def test_another_block(self, page):
-        block = page.thread_list()[7]
+    def test_another_block(self):
+        block = self.page.thread_list()[7]
         assert block.image_url == 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57373100c6017.png'
 
 
