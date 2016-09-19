@@ -1,9 +1,10 @@
 from .islands.adnmb import AdnmbPage
+from .islands.nimingban import NiMingBanPage
 
 
 island_class_map = {
     'adnmb': AdnmbPage,
-
+    'nimingban': NiMingBanPage
 }
 
 class IslandSwitcher:
@@ -22,14 +23,6 @@ class IslandSwitcher:
     @property
     def island_page_model(self):
         return island_class_map[self.island]
-
-    # @property
-    # def cdn_host(self):
-    #     return _island_info[self.island]['CDNHOST']
-    #
-    # @property
-    # def headers(self):
-    #     return _island_info[self.island]['headers']
 
 
 island_switcher = IslandSwitcher()

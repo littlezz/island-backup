@@ -216,7 +216,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
                 # TODO: change this name to local_image
-                block.image = 'image/' + block.image.split('/')[-1]
+                block.image = 'image/' + block.image_url.split('/')[-1]
         all_blocks.extend(thread_list)
 
         if p.has_next():
