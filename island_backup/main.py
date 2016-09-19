@@ -2,16 +2,16 @@ import os
 import sys
 import aiohttp
 import asyncio
-import re
-import traceback
 from functools import partial
+from island_backup.island_switcher import island_switcher
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime
 import click
 from tqdm import tqdm
 import logging
 import aiosocks
 from aiosocks.connector import SocksConnector
+from . import network
+from .network import get_data
 from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
@@ -87,73 +87,16 @@ else:
 env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
 
 
-EMPTY_DATA = object()
-
-session = None
-
 
 ################
 # main
 ################
 
 
-class IslandSwitcher:
-    available_island = ['nimingban', 'kukuku', 'adnmb']
-
-    def __init__(self, island='nimingban'):
-        assert island in self.available_island
-        self.island = island
-
-    def detect_by_url(self, url):
-        for island in self.available_island:
-            if island in url:
-                self.island = island
-                return
-        raise ValueError('Unknown url: {}'.format(url))
-
-    @property
-    def cdn_host(self):
-        return _island_info[self.island]['CDNHOST']
-
-    @property
-    def headers(self):
-        return _island_info[self.island]['headers']
-
-
-island_switcher = IslandSwitcher()
-
-
 def template_render(name, **context):
     return env.get_template(name).render(**context)
 
 
-async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
-    _retry = 0
-    _base = 2
-    _log_error = None
-
-    while _retry < retry:
-        try:
-            async with session.get(url, headers=headers) as r:
-                data = await getattr(r, as_type)()
-        except:
-            # sleep 0s, 1s, 3s
-            await asyncio.sleep(_base**_retry - 1)
-            _retry += 1
-            logging.debug('url: %s retry %s', url, _retry)
-            _log_error = traceback.format_exc()
-        else:
-            break
-    else:
-        logging.error('\n Ignore Error:....\n%s\n...end\n', _log_error)
-        print('Empyt data')
-        return EMPTY_DATA
-
-    logging.debug('finish request %s', url)
-    if callback:
-        asyncio.ensure_future(callback(data, url))
-    else:
-        return data
 
 
 class ImageManager:
@@ -172,7 +115,7 @@ class ImageManager:
         file_path = os.path.join(self.image_dir, file_name)
         return file_path
 
-    async def submit(self, url):
+    async def submit(self, url, headers=None):
         if url in self.url_set:
             return
         else:
@@ -186,7 +129,7 @@ class ImageManager:
         self.busying.add(url)
         await self.sem.acquire()
         task = asyncio.ensure_future(get_data(url, as_type='read',
-                                              headers=island_switcher.headers,
+                                              headers=headers,
                                               callback=partial(self.save_file, file_path=file_path)))
 
         task.add_done_callback(lambda t: self.sem.release())
@@ -225,98 +168,7 @@ class ImageManager:
         logging.debug('urls[3] is %s', urls)
 
 
-def url_page_combine(base_url, num):
-    return base_url + '?page=' + str(num)
 
-
-class Page:
-    def __init__(self, url=None, page_num=1, data=None):
-        self._page = page_num
-        self.base_url = url
-        self.data = data
-
-    @classmethod
-    async def from_url(cls, base_url, page_num):
-        data = await get_data(url_page_combine(base_url, page_num))
-        if data is EMPTY_DATA:
-            asyncio.get_event_loop().stop()
-
-            exit('\nGot Connection Error!')
-        return cls(base_url, page_num, data)
-
-    def thread_list(self):
-        """
-        list of blocks
-        :return:
-        """
-        top = Block(self.data['threads'])
-
-        ext = [Block(reply) for reply in self.data['replys']]
-        ext.insert(0, top)
-        return ext
-
-    @property
-    def next_page_num(self):
-        if self.has_next():
-            return self._page + 1
-
-    @property
-    def next_page_info(self):
-        page_num = self._page + 1
-        return self.base_url, page_num
-
-    def has_next(self):
-        return self._page < self.total_page
-
-    @property
-    def total_page(self):
-        return self.data['page']['size']
-
-
-class Block:
-    """ proxy for div
-    """
-    def __init__(self, block_dict):
-        self._block = block_dict
-
-    def __getattr__(self, item):
-        # property proxy for json data
-        return self._block.get(item)
-
-    @property
-    def id(self):
-        return self._block.get('id')
-
-    @property
-    def uid(self):
-        return self._block.get('uid')
-
-    @property
-    def content(self):
-        return self._block.get('content')
-
-
-    def reply_to(self):
-        """
-        解析里面回复的id, 返回ids
-        :return: list
-        """
-        return re.findall(r'No\.(\d+)', self.content)
-
-    @property
-    def image_url(self):
-        """
-        包含的image url
-        :return:
-        """
-        if not self.image:
-            return None
-        return ''.join((island_switcher.cdn_host, self.image))
-
-    @property
-    def created_time(self):
-        ts = int(self._block['createdAt']) / 1000
-        return datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def sanitize_url(url):
@@ -353,6 +205,7 @@ def split_page_write(path, filename, blocks, page_num=50):
 
 
 async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None):
+    Page = island_switcher.island_page_model
     all_blocks = []
     p = await Page.from_url(first_url, page_num=1)
     process_bar = tqdm(total=p.total_page, position=0, desc='page scanning')
@@ -361,7 +214,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         thread_list = p.thread_list()
         for block in thread_list:
             if block.image_url:
-                asyncio.ensure_future(image_manager.submit(block.image_url))
+                asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
                 # TODO: change this name to local_image
                 block.image = 'image/' + block.image.split('/')[-1]
         all_blocks.extend(thread_list)
@@ -401,7 +254,7 @@ def start(url, force_update):
 
 async def verify_proxy():
     url = 'https://api.github.com/users/littlezz'
-    async with session.get(url) as r:
+    async with network.session.get(url) as r:
         status = r.status
         logging.info('test proxy status, [{}]'.format(status))
         assert r.status == 200
@@ -410,7 +263,7 @@ async def verify_proxy():
 def cli_url_verify(ctx, param, value):
     if value is None:
         return
-    if not any(i in value for i in IslandSwitcher.available_island):
+    if not any(i in value for i in island_switcher.available_island):
         raise click.BadParameter('Unsupported url {}:'.format(value))
     return value
 
@@ -456,8 +309,8 @@ def cli(url, debug, force_update, conn_count, proxy):
     else:
         _conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
 
-    global session
-    session = aiohttp.ClientSession(connector=_conn)
+
+    network.session = aiohttp.ClientSession(connector=_conn)
 
     try:
         try:
@@ -472,7 +325,7 @@ def cli(url, debug, force_update, conn_count, proxy):
             start(url, force_update)
 
     finally:
-        session.close()
+        network.session.close()
         if bundle_env:
             input('Press any key to exit')
 

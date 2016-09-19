@@ -1,14 +1,14 @@
-from island_backup import main
-from island_backup.main import island_switcher, Page
+from island_backup import network
+from island_backup.island_switcher import island_switcher
 import aiohttp
 import asyncio
 
 
 async def get_page(url):
-    main.session = aiohttp.ClientSession()
+    network.session = aiohttp.ClientSession()
     island_switcher.detect_by_url(url)
-    p = await Page.from_url(url, page_num=1)
-    main.session.close()
+    p = await island_switcher.island_page_model.from_url(url, page_num=1)
+    network.session.close()
     return p
 
 
