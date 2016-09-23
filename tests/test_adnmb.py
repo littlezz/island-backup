@@ -28,8 +28,8 @@ class TestAdnmb(BaseTest):
     }
 
 
-    def test_another_block(self):
-        block = self.page.thread_list()[7]
+    def test_another_block(self, thread_list):
+        block = thread_list[7]
         assert block.image_url == 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57373100c6017.png'
 
 

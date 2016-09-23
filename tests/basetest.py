@@ -2,6 +2,7 @@ from island_backup import network
 from island_backup.island_switcher import island_switcher
 import aiohttp
 import asyncio
+import pytest
 
 
 async def get_page(url):
@@ -28,33 +29,36 @@ class BaseTest:
     RAW_URLS = None
     REQUEST_URLS = None
 
-    def setup(self):
+    @pytest.fixture(scope='class')
+    def page(self):
+        return asyncio.get_event_loop().run_until_complete(get_page(self.RAW_URLS[0]))
 
-        self.page = asyncio.get_event_loop().run_until_complete(get_page(self.RAW_URLS[0]))
-        self.thread_list = self.page.thread_list()
+    @pytest.fixture(scope='class')
+    def thread_list(self, page):
+        return page.thread_list()
 
-    def test_sanitize_url(self):
+
+    def test_sanitize_url(self, page):
         for raw, req in zip(self.RAW_URLS, self.REQUEST_URLS):
-            assert self.page.url_page_combine(self.page.sanitize_url(raw), 1) == req
+            assert page.url_page_combine(page.sanitize_url(raw), 1) == req
 
-    def test_page(self):
-        assert self.page.has_next()
-        print(self.page.next_page_info)
-        assert self.page.url_page_combine(*self.page.next_page_info) == self.NEXT_PAGE_URL
+    def test_page(self, page):
+        assert page.has_next()
+        print(page.next_page_info)
+        assert page.url_page_combine(*page.next_page_info) == self.NEXT_PAGE_URL
 
-    def test_blocks_num(self):
-        thread_list = self.thread_list
+    def test_blocks_num(self, thread_list):
         print(len(thread_list))
         assert len(thread_list) == self.THREAD_LIST_NUM
 
 
-    def test_first_block(self):
-        block = self.thread_list[0]
+    def test_first_block(self, thread_list):
+        block = thread_list[0]
         check_block(block, self.BLOCK_0_DATA)
 
-    def test_second_block(self):
-        block = self.thread_list[1]
+    def test_second_block(self, thread_list):
+        block = thread_list[1]
         check_block(block, self.BLOCK_1_DATA)
 
-    def test_another_block(self):
+    def test_another_block(self, thread_list):
         raise NotImplementedError
