@@ -1,10 +1,12 @@
 from .islands.adnmb import AdnmbPage
 from .islands.nimingban import NiMingBanPage
+from .islands.kukuku import KukukuPage
 
 
 island_class_map = {
     'adnmb': AdnmbPage,
-    'nimingban': NiMingBanPage
+    'nimingban': NiMingBanPage,
+    'kukuku': KukukuPage,
 }
 
 class IslandSwitcher:
@@ -23,6 +25,9 @@ class IslandSwitcher:
     @property
     def island_page_model(self):
         return island_class_map[self.island]
+
+    def sanitize_url(self, url):
+        return self.island_page_model.sanitize_url(url)
 
 
 island_switcher = IslandSwitcher()

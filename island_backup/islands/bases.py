@@ -1,7 +1,6 @@
 import asyncio
-
 from datetime import datetime
-from ..utils import EMPTY_DATA, url_page_combine
+from ..utils import EMPTY_DATA
 from ..network import get_data
 import re
 
@@ -16,7 +15,8 @@ class BasePage:
 
     @classmethod
     async def from_url(cls, base_url, page_num):
-        data = await get_data(url_page_combine(base_url, page_num))
+        # always request first page url
+        data = await get_data(cls.url_page_combine(base_url, page_num), as_type='text')
         if data is EMPTY_DATA:
             asyncio.get_event_loop().stop()
 
@@ -41,14 +41,30 @@ class BasePage:
         return self.base_url, page_num
 
     def has_next(self):
-        return self._page < self.total_page
+        raise NotImplementedError
 
-    @property
-    def total_page(self):
+    @staticmethod
+    def url_page_combine(base_url, page_num):
+        raise NotImplementedError
+
+    @staticmethod
+    def sanitize_url(url):
         raise NotImplementedError
 
 
 class BaseJsonPage(BasePage):
+    @classmethod
+    async def from_url(cls, base_url, page_num):
+        data = await get_data(cls.url_page_combine(base_url, page_num), as_type='json')
+        if data is EMPTY_DATA:
+            asyncio.get_event_loop().stop()
+
+            exit('\nGot Connection Error!')
+        return cls(base_url, page_num, data)
+
+    @staticmethod
+    def url_page_combine(base_url, page_num):
+        return base_url + '?page=' + str(page_num)
 
     @property
     def total_page(self):
@@ -64,6 +80,16 @@ class BaseJsonPage(BasePage):
         ext = [self.block_model(reply) for reply in self.data['replys']]
         ext.insert(0, top)
         return ext
+
+    def has_next(self):
+        return self._page < self.total_page
+
+    @staticmethod
+    def sanitize_url(url):
+        from urllib import parse
+        parts = parse.urlsplit(url)
+        path = '/api' + parts.path
+        return parse.urlunsplit((parts.scheme, parts.netloc, path, '', ''))
 
 
 class BaseBlock:

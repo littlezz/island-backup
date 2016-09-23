@@ -6,3 +6,4 @@ tqdm
 docopt
 aiosocks
 pytest
+beautifulsoup4

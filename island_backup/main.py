@@ -236,8 +236,9 @@ def start(url, force_update):
     # first_url = 'http://h.nimingban.com/t/117617'
     # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
     # first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
-    first_url = sanitize_url(first_url)
+    # first_url = sanitize_url(first_url)
     island_switcher.detect_by_url(first_url)
+    first_url = island_switcher.sanitize_url(first_url)
     folder_name = island_switcher.island + '_' + first_url.split('/')[-1]
 
     base_dir = os.path.join('backup', folder_name)
