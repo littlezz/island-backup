@@ -13,7 +13,7 @@ Island Backup
 特性
 ---
 - 支持A岛 (https://h.nimingban.com/)
-- ~~支持kukuku (http://kukuku.cc/)~~  
+- 支持kukuku (http://kukuku.cc/)  
 - 支持备胎岛 (http://h.adnmb.com/Forum)
 - 自动备份图片
 - 并发下载  
@@ -98,4 +98,5 @@ Screenshot
 
 Changelog
 ---------
+- v1.4 修复nimingban, kukuku, 增加单元测试, 分离了类结构。  
 - v1.3 支持备胎岛 2016-09-02
