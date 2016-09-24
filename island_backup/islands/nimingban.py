@@ -54,8 +54,8 @@ class NiMingBanPage(AIslandGetThreadId, BasePage):
     block_model = NiMingBanBlock
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.bs = BeautifulSoup(self.data, 'html.parser')
-        self.bs = BeautifulSoup(self.data, 'lxml')
+        self.bs = BeautifulSoup(self.data, 'html.parser')
+        # self.bs = BeautifulSoup(self.data, 'lxml')
 
     @staticmethod
     def url_page_combine(base_url, page_num):
