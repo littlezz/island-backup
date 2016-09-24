@@ -2,6 +2,7 @@ from .bases import BasePage, BaseBlock
 from bs4 import BeautifulSoup
 import urllib.parse
 import re
+from .mixins import AIslandGetThreadId
 
 
 class KukukuBlock(BaseBlock):
@@ -46,8 +47,7 @@ class KukukuBlock(BaseBlock):
             return None
 
 
-
-class KukukuPage(BasePage):
+class KukukuPage(AIslandGetThreadId, BasePage):
     block_model = KukukuBlock
 
     def __init__(self, *args, **kwargs):
@@ -73,7 +73,6 @@ class KukukuPage(BasePage):
     @property
     def total_page(self):
         return None
-
 
     @staticmethod
     def sanitize_url(url):

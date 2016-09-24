@@ -29,5 +29,8 @@ class IslandSwitcher:
     def sanitize_url(self, url):
         return self.island_page_model.sanitize_url(url)
 
+    def get_folder_name(self, url):
+        return self.island + '_' + str(self.island_page_model.get_thread_id(url))
+
 
 island_switcher = IslandSwitcher()

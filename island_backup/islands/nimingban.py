@@ -1,7 +1,7 @@
 from .bases import BasePage, BaseBlock
 from bs4 import BeautifulSoup
-import urllib.parse
 import re
+from .mixins import AIslandGetThreadId
 
 
 class NiMingBanBlock(BaseBlock):
@@ -50,7 +50,7 @@ class NiMingBanBlock(BaseBlock):
             return None
 
 
-class NiMingBanPage(BasePage):
+class NiMingBanPage(AIslandGetThreadId, BasePage):
     block_model = NiMingBanBlock
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

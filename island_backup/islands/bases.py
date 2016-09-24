@@ -30,6 +30,10 @@ class BasePage:
         """
         raise NotImplementedError
 
+    @staticmethod
+    def get_thread_id(url):
+        raise NotImplementedError
+
     @property
     def next_page_num(self):
         if self.has_next():
@@ -54,6 +58,7 @@ class BasePage:
     @property
     def total_page(self):
         raise NotImplementedError
+
 
 
 class BaseJsonPage(BasePage):

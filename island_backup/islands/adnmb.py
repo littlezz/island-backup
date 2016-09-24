@@ -1,5 +1,5 @@
 from .bases import BaseJsonPage, BaseJsonBlock
-
+from .mixins import AIslandGetThreadId
 
 __all__ = ['AdnmbBlock', 'AdnmbPage']
 
@@ -26,6 +26,6 @@ class AdnmbBlock(BaseJsonBlock):
     request_info = _request_info
 
 
-class AdnmbPage(BaseJsonPage):
+class AdnmbPage(AIslandGetThreadId, BaseJsonPage):
     block_model = AdnmbBlock
 

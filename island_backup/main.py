@@ -239,8 +239,7 @@ def start(url, force_update):
     # first_url = sanitize_url(first_url)
     island_switcher.detect_by_url(first_url)
     first_url = island_switcher.sanitize_url(first_url)
-    folder_name = island_switcher.island + '_' + first_url.split('/')[-1]
-
+    folder_name = island_switcher.get_folder_name(url)
     base_dir = os.path.join('backup', folder_name)
     image_dir = os.path.join(base_dir, 'image')
     os.makedirs(image_dir, exist_ok=True)
