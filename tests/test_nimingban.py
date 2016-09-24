@@ -1,12 +1,12 @@
 from tests.basetest import *
 
 
-class SkipTestNiMingBan(BaseTest):
+class TestNiMingBan(BaseTest):
 
-    REQUEST_URLS = ['https://h.nimingban.com/api/t/9800114?page=1']
+    REQUEST_URLS = ['https://h.nimingban.com/t/9800114?page=1']
     RAW_URLS = ['https://h.nimingban.com/t/9800114']
-    NEXT_PAGE_URL = 'https://h.nimingban.com/api/t/9800114?page=2'
-    THREAD_LIST_NUM = 21
+    NEXT_PAGE_URL = 'https://h.nimingban.com/t/9800114?page=2'
+    THREAD_LIST_NUM = 20
     BLOCK_0_DATA = {
         'image_url': 'http://img1.nimingban.com/image/2016-09-18/57de3d443bce3.jpg',
         'uid': '4ZzUhjy',

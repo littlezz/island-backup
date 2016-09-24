@@ -1,7 +1,10 @@
-from .bases import BaseJsonBlock, BaseJsonPage
+from .bases import BasePage, BaseBlock
+from bs4 import BeautifulSoup
+import urllib.parse
+import re
 
 
-class NiMingBanBlock(BaseJsonBlock):
+class NiMingBanBlock(BaseBlock):
     request_info = {
         'cdn_host': 'http://img1.nimingban.com',
         'headers': {
@@ -19,6 +22,63 @@ class NiMingBanBlock(BaseJsonBlock):
         }
     }
 
+    @property
+    def id(self):
+        return self._block.find('a', class_='h-threads-info-id').text.split('.')[-1]
 
-class NiMingBanPage(BaseJsonPage):
+    @property
+    def uid(self):
+        return self._block.find('span', class_='h-threads-info-uid').text.split(':')[-1]
+
+    @property
+    def content(self):
+        return self._block.find('div', class_='h-threads-content').get_text(strip=True)
+
+    @property
+    def created_time(self):
+        # ex, get 2012-10-23(二)01:20:54
+        s = self._block.find('span', class_='h-threads-info-createdat').text
+        # replace number in parentheses to space
+        return re.sub(r'\(.\)', ' ', s)
+
+    @property
+    def image_url(self):
+        tag = self._block.find('a', class_='h-threads-img-a')
+        if tag:
+            return tag.attrs.get('href')
+        else:
+            return None
+
+
+class NiMingBanPage(BasePage):
     block_model = NiMingBanBlock
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.bs = BeautifulSoup(self.data, 'html.parser')
+        self.bs = BeautifulSoup(self.data, 'lxml')
+
+    @staticmethod
+    def url_page_combine(base_url, page_num):
+        return base_url + '?page=' + str(page_num)
+
+    def thread_list(self):
+        top = self.block_model(self.bs.find(class_='h-threads-item-main'))
+        threads = [self.block_model(b) for b in self.bs.find_all(class_='h-threads-item-reply')]
+        threads.insert(0, top)
+        return threads
+
+    def has_next(self):
+        if self.bs.find('a', text='下一页'):
+            return True
+        return False
+
+    @property
+    def total_page(self):
+        return None
+
+    @staticmethod
+    def sanitize_url(url):
+
+        # remove useless query
+        url = url.rsplit('?')[0]
+        return url

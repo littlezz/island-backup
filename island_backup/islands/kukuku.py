@@ -6,7 +6,7 @@ import re
 
 class KukukuBlock(BaseBlock):
     request_info = {
-        'cdn_host': 'http://static.koukuko.com/h',
+        'cdn_host': 'http://static.kukuku.cc/',
         'headers': {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, sdch',
@@ -14,8 +14,9 @@ class KukukuBlock(BaseBlock):
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive',
             'Dnt': '1',
-            'Host': 'static.koukuko.com',
+            'Host': 'static.kukuku.cc',
             'Pragma': 'no-cache',
+            'Referer': 'http://www.kukuku.cc/t/6645621',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36'
             }
     }
@@ -68,6 +69,10 @@ class KukukuPage(BasePage):
         if self.bs.find('a', text='下一页'):
             return True
         return False
+
+    @property
+    def total_page(self):
+        return None
 
 
     @staticmethod

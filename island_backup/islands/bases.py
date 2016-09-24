@@ -51,6 +51,10 @@ class BasePage:
     def sanitize_url(url):
         raise NotImplementedError
 
+    @property
+    def total_page(self):
+        raise NotImplementedError
+
 
 class BaseJsonPage(BasePage):
     @classmethod
