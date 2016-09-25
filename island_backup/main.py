@@ -16,7 +16,6 @@ from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
 
-
 ##########
 # setup
 ##########
@@ -171,7 +170,6 @@ def start(url, force_update):
     # first_url = 'http://h.nimingban.com/t/117617'
     # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
     # first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
-    # first_url = sanitize_url(first_url)
     island_switcher.detect_by_url(first_url)
     first_url = island_switcher.sanitize_url(first_url)
     folder_name = island_switcher.get_folder_name(url)
@@ -220,7 +218,7 @@ def parse_ipaddress(ctx, param, value):
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
 @click.option('--debug', is_flag=True, help='enable debug mode')
 @click.option('--force-update', is_flag=True, help='force update image')
-@click.option('--conn-count', type=click.IntRange(1, 20), help='max conn number connector use. from 1 to 20. Default is no limit')
+@click.option('--conn-count', type=click.IntRange(1, 20), default=20, help='max conn number connector use. from 1 to 20. Default is 20')
 @click.option('--proxy', '-p', required=False, callback=parse_ipaddress, help='socks proxy address, ex, 127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
