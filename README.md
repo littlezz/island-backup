@@ -54,7 +54,7 @@ https://github.com/littlezz/island-backup/releases
 
 ###windows
 windows 用户运行island_backup.exe 文件.
-输入 url , 目前兹瓷 h.nimingban.com 和 kukuku.cc 的串  
+输入 url ,  
 
 ```shell
 Please Input Url: http://h.nimingban.com/t/6048436?r=6048436

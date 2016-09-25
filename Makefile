@@ -11,3 +11,8 @@ bundle:
 	pyinstaller -n island_backup cli.py -y
 	cp -r island_backup/templates dist/island_backup/
 	cd dist/island_backup; tar -zcvf ../$(name).tar.gz *
+
+pypi:
+	rm -r dist/
+	python3 setup.py bdist_wheel sdist
+	twine upload dist/*
