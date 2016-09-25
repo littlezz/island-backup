@@ -3,6 +3,7 @@ import sys
 import aiohttp
 import asyncio
 from functools import partial
+import urllib.parse as urllib_parse
 from island_backup.island_switcher import island_switcher
 from jinja2 import Environment, FileSystemLoader
 import click
@@ -55,8 +56,15 @@ class ImageManager:
         # force update image
         self.force_update = force_update
 
+
+    @staticmethod
+    def get_image_name(url):
+        path = urllib_parse.urlsplit(url).path
+        name = path.split('/')[-1]
+        return name
+
     def get_image_path(self, url):
-        file_name = url.split('/')[-1]
+        file_name = self.get_image_name(url)
         file_path = os.path.join(self.image_dir, file_name)
         return file_path
 
@@ -150,7 +158,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         for block in thread_list:
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
-                block.image = 'image/' + block.image_url.split('/')[-1]
+                block.image = 'image/' + image_manager.get_image_name(block.image_url)
         all_blocks.extend(thread_list)
 
         if p.has_next():
