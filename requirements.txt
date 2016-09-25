@@ -1,6 +1,5 @@
 aiohttp
 Jinja2
-requests
 click
 tqdm
 docopt
