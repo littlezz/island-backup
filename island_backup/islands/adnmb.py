@@ -28,4 +28,3 @@ class AdnmbBlock(BaseJsonBlock):
 
 class AdnmbPage(AIslandGetThreadId, BaseJsonPage):
     block_model = AdnmbBlock
-

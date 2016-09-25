@@ -52,6 +52,7 @@ class NiMingBanBlock(BaseBlock):
 
 class NiMingBanPage(AIslandGetThreadId, BasePage):
     block_model = NiMingBanBlock
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.bs = BeautifulSoup(self.data, 'html.parser')

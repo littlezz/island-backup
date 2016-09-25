@@ -16,60 +16,6 @@ from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
 
-##########
-# constant
-##########
-
-
-_island_info = {
-    'nimingban': {
-        'CDNHOST': 'http://img1.nimingban.com',
-        'headers': {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, sdch',
-            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'Dnt': '1',
-            'Host': 'img1.nimingban.com',
-            'Pragma': 'no-cache',
-            'Referer': 'http://h.nimingban.com/t/117617?page=10',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
-            }
-        },
-    'kukuku': {
-        'CDNHOST': 'http://static.koukuko.com/h',
-        'headers': {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, sdch',
-            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'Dnt': '1',
-            'Host': 'static.koukuko.com',
-            'Pragma': 'no-cache',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36'
-            }
-    },
-    'adnmb': {
-        'CDNHOST': 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload',
-        'headers': {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, sdch',
-            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'Dnt': '1',
-            'Host': 'h-adnmb-com.n1.yun.tf:8999',
-            'Pragma': 'no-cache',
-            'Referer': 'http://h.adnmb.com/',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
-        }
-    }
-}
-
 
 ##########
 # setup
@@ -168,16 +114,6 @@ class ImageManager:
         logging.debug('urls[3] is %s', urls)
 
 
-
-
-
-def sanitize_url(url):
-    from urllib import parse
-    parts = parse.urlsplit(url)
-    path = '/api' + parts.path
-    return parse.urlunsplit((parts.scheme, parts.netloc, path, '', ''))
-
-
 def write_to_html(path, file_name, all_blocks, page_obj=None):
     thread_id = file_name
     file_name = file_name + '.html'
@@ -215,7 +151,6 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         for block in thread_list:
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
-                # TODO: change this name to local_image
                 block.image = 'image/' + block.image_url.split('/')[-1]
         all_blocks.extend(thread_list)
 
