@@ -22,5 +22,6 @@ class TestNiMingBan(BaseTest):
         'content': '选b啊！！'
     }
 
-    def test_another_block(self):
-        pass
+    def test_another_block(self, thread_list):
+        b = thread_list[4]
+        assert b.content == """<font color="#789922">&gt;&gt;No.9800114</font><br/>……出题老师可以的"""

@@ -32,7 +32,8 @@ class NiMingBanBlock(BaseBlock):
 
     @property
     def content(self):
-        return self._block.find('div', class_='h-threads-content').get_text(strip=True)
+        div = self._block.find('div', class_='h-threads-content')
+        return ''.join(str(e).strip() for e in div.contents)
 
     @property
     def created_time(self):
