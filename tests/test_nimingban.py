@@ -24,4 +24,4 @@ class TestNiMingBan(BaseTest):
 
     def test_another_block(self, thread_list):
         b = thread_list[4]
-        assert b.content == """<font color="#789922">&gt;&gt;No.9800114</font><br/>……出题老师可以的"""
+        assert b.content == """<span class="reply-color"><font color="#789922">&gt;&gt;No.9800114</font></span><br/>……出题老师可以的"""

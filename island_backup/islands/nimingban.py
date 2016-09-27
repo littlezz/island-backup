@@ -30,10 +30,12 @@ class NiMingBanBlock(BaseBlock):
     def uid(self):
         return self._block.find('span', class_='h-threads-info-uid').text.split(':')[-1]
 
-    @property
-    def content(self):
+    def _get_content(self):
         div = self._block.find('div', class_='h-threads-content')
         return ''.join(str(e).strip() for e in div.contents)
+
+    def _deal_with_reply(self, content):
+        return re.sub(r'(<font color.*?>.*?\d+</font>)', r'<span class="reply-color">\1</span>', content)
 
     @property
     def created_time(self):

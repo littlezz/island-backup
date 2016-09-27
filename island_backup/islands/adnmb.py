@@ -1,5 +1,6 @@
 from .bases import BaseJsonPage, BaseJsonBlock
 from .mixins import AIslandGetThreadId
+import re
 
 __all__ = ['AdnmbBlock', 'AdnmbPage']
 
@@ -25,6 +26,8 @@ _request_info = {
 class AdnmbBlock(BaseJsonBlock):
     request_info = _request_info
 
+    def _deal_with_reply(self, content):
+        return re.sub(r'(<font color.*?>.*?\d+</font>)', r'<span class="reply-color">\1</span>', content)
 
 class AdnmbPage(AIslandGetThreadId, BaseJsonPage):
     block_model = AdnmbBlock

@@ -70,6 +70,10 @@
         .to_right {
             float: right;
         }
+
+	    .reply-color {
+		    color: #789922;
+	    }
     </style>
 </head>
 
@@ -83,7 +87,6 @@
             <p><span>{{ data.created_time}}</span> <span>ID: {{ data.uid }}</span> <span>No.{{ data.id }}</span></p>
             <p>{{ data.content }}</p>
         </div>
-
     </div>
 {% endfor %}
 

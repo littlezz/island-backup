@@ -119,6 +119,13 @@ class BaseBlock:
 
     @property
     def content(self):
+        content = self._get_content()
+        return self._deal_with_reply(content=content)
+
+    def _get_content(self):
+        raise NotImplementedError
+
+    def _deal_with_reply(self, content):
         raise NotImplementedError
 
     def reply_to(self):
@@ -159,9 +166,11 @@ class BaseJsonBlock(BaseBlock):
     def uid(self):
         return self._block.get('uid')
 
-    @property
-    def content(self):
+    def _get_content(self):
         return self._block.get('content')
+
+    def _deal_with_reply(self, content):
+        return content
 
     @property
     def image_url(self):
