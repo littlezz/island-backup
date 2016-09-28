@@ -107,6 +107,7 @@ class ImageManager:
             if not self.busying:
                 break
         self.loop.stop()
+        self.pdbar.close()
 
     def status_info(self):
         self.pdbar.update()
