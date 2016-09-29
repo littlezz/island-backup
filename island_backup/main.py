@@ -270,6 +270,7 @@ def cli(url, debug, force_update, conn_count, proxy):
     finally:
         network.session.close()
         if bundle_env:
+            click.echo('\n')
             input('Press any key to exit')
 
 
