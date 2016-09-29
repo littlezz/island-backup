@@ -169,8 +169,9 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
             break
 
     split_page_write(path=base_dir, filename=folder_name, blocks=all_blocks, page_num=50)
-    await image_manager.wait_all_task_done()
     process_bar.close()
+    await image_manager.wait_all_task_done()
+
 
 
 def start(url, force_update):
