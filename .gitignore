@@ -5,7 +5,7 @@ backup/
 .DS_Store
 test_run.py
 test.html
-
+island_backup.json
 *.py[cd]
 
 .cache

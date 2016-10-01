@@ -5,6 +5,7 @@ import asyncio
 from functools import partial
 import urllib.parse as urllib_parse
 from island_backup.island_switcher import island_switcher
+from .settings import settings
 from jinja2 import Environment, FileSystemLoader
 import click
 from tqdm import tqdm
@@ -226,10 +227,12 @@ def parse_ipaddress(ctx, param, value):
 @click.command()
 @click.argument('url', required=False, callback=cli_url_verify)
 @click.option('-url', prompt='Please Input Url', callback=cli_url_verify)
-@click.option('--debug', is_flag=True, help='enable debug mode')
-@click.option('--force-update', is_flag=True, help='force update image')
-@click.option('--conn-count', type=click.IntRange(1, 20), default=20, help='max conn number connector use. from 1 to 20. Default is 20')
-@click.option('--proxy', '-p', required=False, callback=parse_ipaddress, help='socks proxy address, ex, 127.0.0.1:1080')
+@click.option('--debug', is_flag=True, help='enable debug mode', default=settings['debug'])
+@click.option('--force-update', is_flag=True, help='force update image', default=settings['force-update'])
+@click.option('--conn-count', type=click.IntRange(1, 20), default=settings['conn-count'],
+              help='max conn number connector use. from 1 to 20. Default is 20')
+@click.option('--proxy', '-p', required=False, callback=parse_ipaddress, default=settings['proxy'],
+              help='socks proxy address, ex, 127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
     click.echo('version: {}'.format(__version__))
@@ -240,6 +243,8 @@ def cli(url, debug, force_update, conn_count, proxy):
 
     logging.info('conn number is %s', conn_count)
     logging.info('proxy is %s', proxy)
+
+    logging.debug('settings: {}'.format(settings))
 
     conn_kwargs = dict(
         use_dns_cache=True,
