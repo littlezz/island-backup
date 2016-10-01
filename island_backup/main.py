@@ -126,14 +126,6 @@ class ImageManager:
         logging.debug('urls[3] is %s', urls)
 
 
-def write_to_html(path, file_name, all_blocks, page_obj=None):
-    thread_id = file_name
-    file_name = file_name + '.html'
-    save_to = os.path.join(path, file_name)
-    with open(save_to, 'w', encoding='utf8') as f:
-        f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks, page_obj=page_obj))
-
-
 def split_page_write(path, filename, blocks, page_num=50, force_update=False):
 
     def _cp_static_file(path, force_update):
@@ -147,6 +139,13 @@ def split_page_write(path, filename, blocks, page_num=50, force_update=False):
                 return
         # copy directory
         shutil.copytree(static_directory, target_directory)
+
+    def write_to_html(path, file_name, all_blocks, page_obj=None):
+        thread_id = file_name
+        file_name = file_name + '.html'
+        save_to = os.path.join(path, file_name)
+        with open(save_to, 'w', encoding='utf8') as f:
+            f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks, page_obj=page_obj))
 
 
     if not page_num:
