@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import aiohttp
 import asyncio
@@ -30,8 +31,10 @@ if bundle_env:
 else:
     BASE = os.path.dirname(__file__)
 
+TEMPLATES_PATH = os.path.join(BASE, 'templates')
 
-env = Environment(loader=FileSystemLoader(os.path.join(BASE, 'templates')), trim_blocks=True)
+
+env = Environment(loader=FileSystemLoader(TEMPLATES_PATH), trim_blocks=True)
 
 
 
@@ -131,7 +134,21 @@ def write_to_html(path, file_name, all_blocks, page_obj=None):
         f.write(template_render('base.html', title=thread_id, all_blocks=all_blocks, page_obj=page_obj))
 
 
-def split_page_write(path, filename, blocks, page_num=50):
+def split_page_write(path, filename, blocks, page_num=50, force_update=False):
+
+    def _cp_static_file(path, force_update):
+        static_directory = os.path.join(TEMPLATES_PATH, 'static')
+        target_directory = os.path.join(path, 'static')
+        # determine whether remove exists path or return
+        if os.path.exists(target_directory):
+            if force_update:
+                shutil.rmtree(target_directory)
+            else:
+                return
+        # copy directory
+        shutil.copytree(static_directory, target_directory)
+
+
     if not page_num:
         write_to_html(path, filename, blocks)
 
@@ -148,8 +165,10 @@ def split_page_write(path, filename, blocks, page_num=50):
             page_obj.pop('next')
         write_to_html(path, page_filename, chunk, page_obj)
 
+    _cp_static_file(path, force_update=force_update)
 
-async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None):
+
+async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None, force_update=False):
     Page = island_switcher.island_page_model
     all_blocks = []
     p = await Page.from_url(first_url, page_num=1)
@@ -169,7 +188,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         else:
             break
 
-    split_page_write(path=base_dir, filename=folder_name, blocks=all_blocks, page_num=50)
+    split_page_write(path=base_dir, filename=folder_name, blocks=all_blocks, page_num=50, force_update=force_update)
     process_bar.close()
     await image_manager.wait_all_task_done()
 
@@ -192,7 +211,8 @@ def start(url, force_update):
     logging.info('island is %s', island_switcher.island)
     loop = asyncio.get_event_loop()
     image_manager = ImageManager(image_dir, loop, force_update=force_update)
-    loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager, folder_name=folder_name))
+    loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager,
+                         folder_name=folder_name, force_update=force_update))
     loop.run_forever()
 
 
@@ -243,6 +263,7 @@ def cli(url, debug, force_update, conn_count, proxy):
 
     logging.info('conn number is %s', conn_count)
     logging.info('proxy is %s', proxy)
+    logging.info('force-update is %s', force_update)
 
     logging.debug('settings: {}'.format(settings))
 
