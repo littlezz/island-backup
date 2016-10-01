@@ -87,6 +87,22 @@ Options:
  
 ```
 
+###配置文件
+
+另外支持使用名字为"island_backup.json"的文件保存配置， 程序在启动时默认搜索当前目录，和`~/.island_backup`。  
+
+比如一个配置文件  
+
+```json
+{
+  "conn-count": "10",
+  "debug": true,
+  "proxy": "127.0.0.1:1080"
+}
+```
+
+
+
 ![](/screenshot/shell.png)
 
 
