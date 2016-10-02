@@ -114,5 +114,6 @@ Screenshot
 
 Changelog
 ---------
+- v1.5 分离了备份文件中的css和js；现在可以使用配置文件了。
 - v1.4 修复nimingban, kukuku, 增加单元测试, 分离了类结构。  
 - v1.3 支持备胎岛 2016-09-02
