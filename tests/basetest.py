@@ -26,7 +26,9 @@ class BaseTest:
     THREAD_LIST_NUM = 20
     BLOCK_0_DATA = None
     BLOCK_1_DATA = None
+    # 原始用户输入的URL
     RAW_URLS = None
+    # 转换后程序应该请求的URL， 与RAW_URLS一一对应。
     REQUEST_URLS = None
 
     @pytest.fixture(scope='class')
