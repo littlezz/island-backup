@@ -17,6 +17,7 @@ class The4ChanBlock(BaseJsonBlock):
             'Connection': 'keep-alive',
             'Dnt': '1',
             'Pragma': 'no-cache',
+            'Host': 'i.4cdn.org',
             'Referer': 'http://boards.4chan.org/',
             'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
@@ -29,14 +30,14 @@ class The4ChanBlock(BaseJsonBlock):
 
     @property
     def id(self):
-        return self._block['no']
+        return self._block.get('no', '')
 
     @property
     def uid(self):
-        return self._block['name']
+        return self._block.get('name', '')
 
     def _get_content(self):
-        return self._block['com']
+        return self._block.get('com', '')
 
     def _deal_with_reply(self, content):
         return content
