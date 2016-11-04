@@ -12,6 +12,6 @@ function show_big(id){
         id.style.width="auto";
         id.style.maxWidth="25%";
         id.dataset.big=0;
-        id.style.cursor = 'zoom-out';
+        id.style.cursor = 'zoom-in';
     }
 }
