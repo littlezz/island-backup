@@ -8,6 +8,8 @@ The content will be saved as html file.
 
 `Island Backup` is written by aiohttp which use `asyncio`, so only support Python3.
 
+`中文文档 <https://github.com/littlezz/island-backup/blob/master/README_chinese.md>`__
+
 So far, `Island Backup` Support website below
 
 - A岛 (https://h.nimingban.com/)
