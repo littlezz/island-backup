@@ -15,6 +15,7 @@ Island Backup
 - 支持A岛 (https://h.nimingban.com/)
 - 支持kukuku (http://kukuku.cc/)  
 - 支持备胎岛 (http://h.adnmb.com/Forum)
+- 支持4chan (http://www.4chan.org/)
 - 自动备份图片
 - 并发下载  
 - 使用aiohttp而非多线程
