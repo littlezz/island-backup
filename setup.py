@@ -31,7 +31,7 @@ setup(
     tests_require=['pytest'],
     include_package_data=True,
     package_data={
-        'island_backup': ['templates/*']
+        'island_backup': ['templates/']
     },
     zip_safe=False,
     entry_points={
