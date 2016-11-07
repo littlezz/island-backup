@@ -99,5 +99,5 @@ ScreenShot
 ..  |LICENCE| image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)
     :target: https://github.com/littlezz/island-backup/blob/master/LICENSE
 ..  |ScreenShot-1| image:: https://github.com/littlezz/island-backup/blob/master/screenshot/html-preview.png
-..  |Shell-Animation| image:: https://github.com/littlezz/island-backup/blob/dev/screenshot/shell.gif
+..  |Shell-Animation| image:: https://github.com/littlezz/island-backup/blob/master/screenshot/shell.gif
 
