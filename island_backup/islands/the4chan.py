@@ -50,7 +50,7 @@ class The4ChanBlock(BaseJsonBlock):
         ext = self._block['ext']
 
         image_name = str(tim) + ext
-        url = os.path.join(self.request_info['cdn_host'], self.broad, image_name)
+        url = '/'.join((self.request_info['cdn_host'], self.broad, image_name))
         return url
 
     @property
