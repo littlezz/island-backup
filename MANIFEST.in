@@ -1,3 +1,5 @@
 include README.rst
 include README_chinese.md
-include LICENSE.txt
+include requirements.txt
+include LICENSE
+recursive-include island_backup/templates *
