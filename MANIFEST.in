@@ -1,1 +1,3 @@
-include README.md
+include README.rst
+include README_chinese.md
+include LICENSE.txt

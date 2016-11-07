@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open('README.md', 'r', encoding='utf8') as f:
+with open('README.rst', 'r', encoding='utf8') as f:
     readme = f.read()
 
 with open('requirements.txt','r',encoding='utf8') as f:
@@ -12,7 +12,7 @@ version = __import__('island_backup').version
 setup(
     name='island_backup',
     version=version,
-    description="backup h.nimingban and kukuku.cc",
+    description="backup 4chan.org h.nimingban and kukuku.cc",
     long_description=readme,
     classifiers=[
         'Development Status :: 3 - Alpha',
