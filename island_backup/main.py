@@ -181,7 +181,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
                 block.image = 'image/' + image_manager.get_image_name(block.image_url)
-                logging.info('block.image set to -> %s', block.image)
+                logging.debug('block.image set to -> %s', block.image)
         all_blocks.extend(thread_list)
 
         if p.has_next():
