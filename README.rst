@@ -16,6 +16,13 @@ So far, `Island Backup` Support website below
 - 4chan (http://www.4chan.org/)
 
 
+|Shell-Animation|
+
+
+
+
+
+
 ..  code-block::
 
     island_backup http://boards.4chan.org/a/thread/149376017
@@ -90,4 +97,5 @@ ScreenShot
 ..  |LICENCE| image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)
     :target: https://github.com/littlezz/island-backup/blob/master/LICENSE
 ..  |ScreenShot-1| image:: https://github.com/littlezz/island-backup/blob/master/screenshot/html-preview.png
+..  |Shell-Animation| image:: https://github.com/littlezz/island-backup/blob/master/screenshot/shell.gif
 
