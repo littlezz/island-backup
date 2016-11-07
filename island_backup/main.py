@@ -109,7 +109,9 @@ class ImageManager:
         while True:
             await asyncio.sleep(3)
             if not self.busying:
+                logging.debug('Finish Waitting, all images has been downloaded')
                 break
+            logging.debug('Still waitting for all images be downloaded')
         self.loop.stop()
         self.pdbar.close()
 
@@ -179,6 +181,7 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
             if block.image_url:
                 asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
                 block.image = 'image/' + image_manager.get_image_name(block.image_url)
+                logging.info('block.image set to -> %s', block.image)
         all_blocks.extend(thread_list)
 
         if p.has_next():
