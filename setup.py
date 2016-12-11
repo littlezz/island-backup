@@ -29,7 +29,7 @@ setup(
     packages=find_packages(exclude=['tests*',]),
     install_requires=requirements,
     tests_require=['pytest'],
-    include_package_data=True,
+    # include_package_data=True,
     package_data={
         'island_backup': ['templates/*', 'templates/static/*']
     },
