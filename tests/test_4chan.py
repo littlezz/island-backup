@@ -4,7 +4,7 @@ from .basetest import *
 class Test4Chan(BaseTest):
     RAW_URLS = ['http://boards.4chan.org/u/thread/1436960/welcome-to-u', 'http://boards.4chan.org/u/thread/1436960']
     REQUEST_URLS = ['http://a.4cdn.org/u/thread/1436960.json', 'http://a.4cdn.org/u/thread/1436960.json']
-    NEXT_PAGE_URL = None
+    NEXT_PAGE_URL = NO_NEXT_PAGE
     THREAD_LIST_NUM = 5
     BLOCK_0_DATA = {
         'image_url': 'http://i.4cdn.org/u/1376789114258.jpg',
@@ -26,5 +26,5 @@ class Test4Chan(BaseTest):
     def test_another_block(self, thread_list):
         pass
 
-    def test_page(self, page):
-        pass
+    # def test_page(self, page):
+    #     pass

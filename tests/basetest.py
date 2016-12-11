@@ -5,6 +5,10 @@ import asyncio
 import pytest
 
 
+NO_NEXT_PAGE = object()
+
+
+
 async def get_page(url):
     network.session = aiohttp.ClientSession()
     island_switcher.detect_by_url(url)
@@ -45,6 +49,9 @@ class BaseTest:
             assert page.url_page_combine(page.sanitize_url(raw), 1) == req
 
     def test_page(self, page):
+        if self.NEXT_PAGE_URL is NO_NEXT_PAGE:
+            return
+
         assert page.has_next()
         print(page.next_page_info)
         assert page.url_page_combine(*page.next_page_info) == self.NEXT_PAGE_URL
