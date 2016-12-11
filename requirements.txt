@@ -4,5 +4,4 @@ click
 tqdm
 docopt
 aiosocks
-pytest < 3
 beautifulsoup4
