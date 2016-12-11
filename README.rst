@@ -98,6 +98,6 @@ ScreenShot
     :target: https://pypi.python.org/pypi/island-backup
 ..  |LICENCE| image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)
     :target: https://github.com/littlezz/island-backup/blob/master/LICENSE
-..  |ScreenShot-1| image:: https://raw.githubusercontent.com/littlezz/island-backup/master/screenshot/html-preview.png
+..  |ScreenShot-1| image:: https://raw.githubusercontent.com/littlezz/island-backup/master/screenshot/html-preview.jpg
 ..  |Shell-Animation| image:: https://raw.githubusercontent.com/littlezz/island-backup/master/screenshot/shell.gif
 

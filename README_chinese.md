@@ -10,6 +10,9 @@ Island Backup
 备份匿名版上的串, 图片到本地, 以html形式查看  
 
 
+![](/screenshot/shell.gif)
+
+
 特性
 ---
 - 支持A岛 (https://h.nimingban.com/)
@@ -104,13 +107,13 @@ Options:
 
 
 
-![](/screenshot/shell.png)
+![](/screenshot/shell.jpg)
 
 
 
 Screenshot
 ----------
-![](/screenshot/html-preview.png)
+![](/screenshot/html-preview.jpg)
 
 
 Changelog
