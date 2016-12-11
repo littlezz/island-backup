@@ -8,7 +8,7 @@ class TestNiMingBan(BaseTest):
     NEXT_PAGE_URL = 'https://h.nimingban.com/t/9800114?page=2'
     THREAD_LIST_NUM = 20
     BLOCK_0_DATA = {
-        'image_url': 'http://img1.nimingban.com/image/2016-09-18/57de3d443bce3.jpg',
+        'image_url': 'http://cdn.ovear.info:8998/image/2016-09-18/57de3d443bce3.jpg',
         'uid': '4ZzUhjy',
         'id': '9800114',
         'created_time': '2016-09-18 15:07:48',
