@@ -62,9 +62,21 @@ class BasePage:
 
 
 class BaseJsonPage(BasePage):
+    request_headers = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, sdch',
+        'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Dnt': '1',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36'
+    }
+
+
     @classmethod
     async def from_url(cls, base_url, page_num):
-        data = await get_data(cls.url_page_combine(base_url, page_num), as_type='json')
+        data = await get_data(cls.url_page_combine(base_url, page_num), as_type='json', headers=cls.request_headers)
         if data is EMPTY_DATA:
             asyncio.get_event_loop().stop()
 
