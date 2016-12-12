@@ -2,6 +2,7 @@ from .islands.adnmb import AdnmbPage
 from .islands.nimingban import NiMingBanPage
 from .islands.kukuku import KukukuPage
 from .islands.the4chan import The4ChanPage
+from .islands.the2chan import The2ChanPage
 
 
 island_class_map = {
@@ -9,6 +10,7 @@ island_class_map = {
     'nimingban': NiMingBanPage,
     'kukuku': KukukuPage,
     '4chan': The4ChanPage,
+    '2chan': The2ChanPage,
 }
 
 class IslandSwitcher:

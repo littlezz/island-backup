@@ -4,6 +4,10 @@ import re
 from urllib import parse
 
 
+def openbr2closebr(html: str):
+    return html.replace('<br>', '<br/>')
+
+
 class The2ChanBlock(BaseBlock):
     request_info = {
         'cdn_host': None,
@@ -45,11 +49,22 @@ class The2ChanBlock(BaseBlock):
         return ''.join(str(e).strip() for e in div.contents)
 
     def _deal_with_reply(self, content):
-        re.sub(r'<font color.*?>(.*?)</font>', r'<span class="reply-color">\1</span>', content)
+        return re.sub(r'<font color.*?>(.*?)</font>', r'<span class="reply-color">\1</span>', content)
 
     @property
     def image_url(self):
-        tag = self._block.find('a')
+        tag = self._block.find('a', target='_blank')
+        if not tag:
+            return None
+        path = tag.attrs.get('href')
+        url = parse.urljoin(self._page_domain, path)
+        return url
+
+
+class The2ChanFirstBlock(The2ChanBlock):
+    @property
+    def image_url(self):
+        tag = self._block.find('a', target='_blank', recursive=False)
         if not tag:
             return None
         path = tag.attrs.get('href')
@@ -63,7 +78,8 @@ class The2ChanPage(BasePage):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.bs = BeautifulSoup(self.data, 'html.parser')
+        html = openbr2closebr(self.data)
+        self.bs = BeautifulSoup(html, 'html.parser')
 
     @staticmethod
     def url_page_combine(base_url, page_num):
@@ -82,7 +98,7 @@ class The2ChanPage(BasePage):
 
     def thread_list(self):
         domain = parse.urljoin(self.base_url, '/')
-        top = self.block_model(self.bs.find(class_='thre'), page_domain=domain)
+        top = The2ChanFirstBlock(self.bs.find(class_='thre'), page_domain=domain)
         threads = [self.block_model(b, page_domain=domain) for b in self.bs.find_all('td', class_='rtd')]
         threads.insert(0, top)
         return threads
