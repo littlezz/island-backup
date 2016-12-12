@@ -1,6 +1,7 @@
 from .bases import BasePage, BaseBlock
 from bs4 import BeautifulSoup
 import re
+from urllib import parse
 
 
 class The2ChanBlock(BaseBlock):
@@ -21,6 +22,72 @@ class The2ChanBlock(BaseBlock):
         }
     }
 
+    def __init__(self, block_data, page_domain):
+        super().__init__(block_data)
+        self._page_domain = page_domain
+
     @property
     def id(self):
-        return self._block.find('').text
+        info_string = self._block.find('a', class_='del').previous
+        return info_string[info_string.find('No')+3:].strip()
+
+    @property
+    def uid(self):
+        return self._block.find('font', color='#117743').text
+    
+    @property
+    def created_time(self):
+        info_string = self._block.find('a', class_='del').previous
+        return info_string[: info_string.find('No')].strip()
+
+    def _get_content(self):
+        div = self._block.find('blockquote')
+        return ''.join(str(e).strip() for e in div.contents)
+
+    def _deal_with_reply(self, content):
+        re.sub(r'<font color.*?>(.*?)</font>', r'<span class="reply-color">\1</span>', content)
+
+    @property
+    def image_url(self):
+        tag = self._block.find('a')
+        if not tag:
+            return None
+        path = tag.attrs.get('href')
+        url = parse.urljoin(self._page_domain, path)
+        return url
+
+
+
+class The2ChanPage(BasePage):
+    block_model = The2ChanBlock
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bs = BeautifulSoup(self.data, 'html.parser')
+
+    @staticmethod
+    def url_page_combine(base_url, page_num):
+        return base_url
+
+    def has_next(self):
+        return False
+
+    @property
+    def total_page(self):
+        return None
+
+    @staticmethod
+    def get_thread_id(url):
+        return re.match(r'.*?/(\d+)\.htm', url).group(1)
+
+    def thread_list(self):
+        domain = parse.urljoin(self.base_url, '/')
+        top = self.block_model(self.bs.find(class_='thre'), page_domain=domain)
+        threads = [self.block_model(b, page_domain=domain) for b in self.bs.find_all('td', class_='rtd')]
+        threads.insert(0, top)
+        return threads
+
+    @staticmethod
+    def sanitize_url(url):
+        parts = parse.urlparse(url)
+        return '{0.scheme}://{0.netloc}{0.path}'.format(parts)
