@@ -16,6 +16,7 @@ So far, `Island Backup` Support website below
 - kukuku (http://kukuku.cc/)
 - 备胎岛 (http://h.adnmb.com/Forum)
 - 4chan (http://www.4chan.org/)
+- 2chan (http://www.2chan.net/)
 
 
 |Shell-Animation|

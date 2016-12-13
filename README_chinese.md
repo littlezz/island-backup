@@ -19,6 +19,7 @@ Island Backup
 - 支持kukuku (http://kukuku.cc/)  
 - 支持备胎岛 (http://h.adnmb.com/Forum)
 - 支持4chan (http://www.4chan.org/)
+- 2chan (http://www.2chan.net/)
 - 自动备份图片
 - 并发下载  
 - 使用aiohttp而非多线程
