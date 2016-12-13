@@ -18,9 +18,8 @@ class The2ChanBlock(BaseBlock):
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive',
             'Dnt': '1',
-            'Host': 'img1.nimingban.com',
             'Pragma': 'no-cache',
-            'Referer': 'http://h.nimingban.com/t/117617?page=10',
+            'Referer': 'http://www.2chan.net/',
             'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36'
         }
