@@ -1,5 +1,6 @@
 from .basetest import *
 
+
 class TestKukuku(BaseTest):
     RAW_URLS = ['http://www.kukuku.cc/t/6934861/1', 'http://www.kukuku.cc/t/6934861']
     REQUEST_URLS = ['http://www.kukuku.cc/t/6934861/1', 'http://www.kukuku.cc/t/6934861/1']
@@ -20,5 +21,5 @@ class TestKukuku(BaseTest):
         'content': """斯大林主子(ﾟДﾟ≡ﾟДﾟ)""",
     }
 
-    def test_another_block(self):
+    def test_another_block(self, thread_list):
         pass

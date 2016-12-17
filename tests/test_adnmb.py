@@ -1,10 +1,4 @@
-import pytest
-import asyncio
-
 from tests.basetest import *
-
-
-
 
 
 class TestAdnmb(BaseTest):
@@ -32,13 +26,4 @@ class TestAdnmb(BaseTest):
         block = thread_list[7]
         assert block.image_url == 'http://h-adnmb-com.n1.yun.tf:8999/Public/Upload/image/2016-05-14/57373100c6017.png'
 
-
-def atest_tmp(tmpdir):
-    a = tmpdir.mkdir('sub')
-    with open(str(a) + '/xx.txt', 'w') as f:
-        f.write('?')
-    c= a.join('xx.txt')
-    print(c.read())
-    print(a)
-    assert 0
 

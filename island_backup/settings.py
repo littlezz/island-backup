@@ -2,7 +2,6 @@ import json
 import os.path
 
 
-
 SEARCH_PATH = ['.', os.path.expanduser('~/.island_backup')]
 CONFIG_FILENAME = 'island_backup.json'
 

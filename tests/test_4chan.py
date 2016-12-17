@@ -25,6 +25,3 @@ class Test4Chan(BaseTest):
 
     def test_another_block(self, thread_list):
         pass
-
-    # def test_page(self, page):
-    #     pass
