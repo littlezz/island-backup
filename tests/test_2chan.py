@@ -2,7 +2,7 @@ from .basetest import *
 
 
 
-class Test2Chan(BaseTest):
+class _Test2Chan(BaseTest):
     REQUEST_URLS = ['http://dec.2chan.net/62/res/29194.htm']
     RAW_URLS = ['http://dec.2chan.net/62/res/29194.htm']
     NEXT_PAGE_URL = NO_NEXT_PAGE

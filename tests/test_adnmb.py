@@ -7,7 +7,7 @@ from tests.basetest import *
 
 
 
-class TestAdnmb(BaseTest):
+class _TestAdnmb(BaseTest):
     RAW_URLS = ['http://h.adnmb.com/t/106983']
     REQUEST_URLS = ['http://h.adnmb.com/api/t/106983?page=1']
     NEXT_PAGE_URL = 'http://h.adnmb.com/api/t/106983?page=2'

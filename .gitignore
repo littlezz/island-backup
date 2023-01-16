@@ -15,3 +15,7 @@ temp/
 dist/
 build/
 *.spec
+.python-version
+ttt.py
+.vscode/launch.json
+.vscode/settings.json
