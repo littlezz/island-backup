@@ -15,8 +15,11 @@ So far, `Island Backup` Support website below
 - A岛 (https://www.nmbxd1.com/)
 - 4chan (http://www.4chan.org/)
 - 2chan (http://www.2chan.net/)
-- <del>支持kukuku (http://kukuku.cc/)</del>
-- <del>支持备胎岛 (http://h.adnmb.com/Forum)</del>
+  
+remove
+
+- (remove)kukuku (http://kukuku.cc/)
+- (remove)备胎岛 (http://h.adnmb.com/Forum)
 
 
 |Shell-Animation|
