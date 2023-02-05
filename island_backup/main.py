@@ -287,8 +287,7 @@ def cli(url, debug, force_update, conn_count, proxy):
         try:
             if proxy:
                 logging.info('Test whether proxy config is correct')
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(verify_proxy())
+                asyncio.run(verify_proxy())
         except (aiohttp.errors.ProxyConnectionError, ConnectionRefusedError, AssertionError) as e:
             print('Proxy config is wrong!\n {}'.format(e))
 
@@ -296,7 +295,7 @@ def cli(url, debug, force_update, conn_count, proxy):
             start(url, force_update)
 
     finally:
-        network.session.close()
+        asyncio.run(network.session.close())
         if bundle_env:
             click.echo('\n')
             input('Press any key to exit')
