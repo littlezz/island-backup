@@ -11,8 +11,7 @@ from jinja2 import Environment, FileSystemLoader
 import click
 from tqdm import tqdm
 import logging
-import aiosocks
-from aiosocks.connector import SocksConnector
+
 from . import network
 from .network import get_data
 from . import version as __version__
@@ -272,14 +271,15 @@ def cli(url, debug, force_update, conn_count, proxy):
     conn_kwargs = dict(
         use_dns_cache=True,
         limit=conn_count,
-        conn_timeout=60
+        # conn_timeout=60
     )
 
+#TODO: fix proxy
     if not proxy:
         _conn = aiohttp.TCPConnector(**conn_kwargs)
     else:
-        _conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
-
+        #_conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
+        pass
 
     network.session = aiohttp.ClientSession(connector=_conn)
 
@@ -287,8 +287,7 @@ def cli(url, debug, force_update, conn_count, proxy):
         try:
             if proxy:
                 logging.info('Test whether proxy config is correct')
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(verify_proxy())
+                asyncio.run(verify_proxy())
         except (aiohttp.errors.ProxyConnectionError, ConnectionRefusedError, AssertionError) as e:
             print('Proxy config is wrong!\n {}'.format(e))
 
@@ -296,7 +295,7 @@ def cli(url, debug, force_update, conn_count, proxy):
             start(url, force_update)
 
     finally:
-        network.session.close()
+        asyncio.run(network.session.close())
         if bundle_env:
             click.echo('\n')
             input('Press any key to exit')

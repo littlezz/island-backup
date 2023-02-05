@@ -7,7 +7,7 @@ from .islands.the2chan import The2ChanPage
 
 island_class_map = {
     'adnmb': AdnmbPage,
-    'nimingban': NiMingBanPage,
+    'nmbxd1': NiMingBanPage,
     'kukuku': KukukuPage,
     '4chan': The4ChanPage,
     '2chan': The2ChanPage,

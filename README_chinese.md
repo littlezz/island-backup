@@ -15,11 +15,11 @@ Island Backup
 
 特性
 ---
-- 支持A岛 (https://h.nimingban.com/)
-- 支持kukuku (http://kukuku.cc/)  
-- 支持备胎岛 (http://h.adnmb.com/Forum)
+- 支持A岛 (https://www.nmbxd1.com/)
 - 支持4chan (http://www.4chan.org/)
 - 2chan (http://www.2chan.net/)
+- <del>支持kukuku (http://kukuku.cc/)</del>
+- <del>支持备胎岛 (http://h.adnmb.com/Forum)</del>
 - 自动备份图片
 - 并发下载  
 - 使用aiohttp而非多线程
@@ -35,14 +35,14 @@ https://github.com/littlezz/island-backup/releases
 
 ###clone  
 
-需要python >= 3.5  
+需要python >= 3.11 
 依赖库请查看requirements.txt  
 
 下载程序  
 `git clone https://github.com/littlezz/island-backup`  
 
 安装依赖
-`pip(3) install -r requirements.txt`
+`pip(3) install -r requirements.txt`4
 
 
 ###pip   
@@ -62,7 +62,7 @@ windows 用户运行island_backup.exe 文件.
 输入 url ,  
 
 ```shell
-Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
+Please Input Url: https://www.nmbxd1.com/t/52752005?r=52752005
 ```  
 
 内容在backup文件夹里面.  
@@ -70,7 +70,7 @@ Please Input Url: http://h.nimingban.com/t/6048436?r=6048436
 ###Mac && Linux
 推荐使用 pip 安装, 之后可以使用`island_backup`, 会在当前目录下生成backup文件夹.  
 
-`island_backup http://h.nimingban.com/t/6048436?r=6048436`  
+`island_backup https://www.nmbxd1.com/t/52752005?r=52752005`  
 
 使用`island_backup --help` 查看所有支持的指令  
 
@@ -114,7 +114,7 @@ Options:
 
 Screenshot
 ----------
-![](/screenshot/html-preview.jpg)
+![](/screenshot/screenshot2.jpg)
 
 
 Changelog

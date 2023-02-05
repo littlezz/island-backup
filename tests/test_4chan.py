@@ -1,7 +1,7 @@
 from .basetest import *
 
 
-class Test4Chan(BaseTest):
+class _Test4Chan(BaseTest):
     RAW_URLS = ['http://boards.4chan.org/u/thread/1436960/welcome-to-u', 'http://boards.4chan.org/u/thread/1436960']
     REQUEST_URLS = ['http://a.4cdn.org/u/thread/1436960.json', 'http://a.4cdn.org/u/thread/1436960.json']
     NEXT_PAGE_URL = NO_NEXT_PAGE

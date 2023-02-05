@@ -1,6 +1,6 @@
 from .basetest import *
 
-class TestKukuku(BaseTest):
+class _TestKukuku(BaseTest):
     RAW_URLS = ['http://www.kukuku.cc/t/6934861/1', 'http://www.kukuku.cc/t/6934861']
     REQUEST_URLS = ['http://www.kukuku.cc/t/6934861/1', 'http://www.kukuku.cc/t/6934861/1']
     NEXT_PAGE_URL = 'http://www.kukuku.cc/t/6934861/2'

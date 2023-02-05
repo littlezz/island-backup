@@ -3,25 +3,25 @@ from tests.basetest import *
 
 class TestNiMingBan(BaseTest):
 
-    REQUEST_URLS = ['https://h.nimingban.com/t/9800114?page=1']
-    RAW_URLS = ['https://h.nimingban.com/t/9800114']
-    NEXT_PAGE_URL = 'https://h.nimingban.com/t/9800114?page=2'
+    REQUEST_URLS = ['https://www.nmbxd1.com/t/55333001?page=1']
+    RAW_URLS = ['https://www.nmbxd1.com/t/55333001?r=55333007']
+    NEXT_PAGE_URL = 'https://www.nmbxd1.com/t/55333001?page=2'
     THREAD_LIST_NUM = 20
     BLOCK_0_DATA = {
-        'image_url': 'http://cdn.ovear.info:8998/image/2016-09-18/57de3d443bce3.jpg',
-        'uid': '4ZzUhjy',
-        'id': '9800114',
-        'created_time': '2016-09-18 15:07:48',
-        'content': """下个星期就考了，好慌"""
+        'image_url': 'https://image.nmb.best/image/2023-02-05/63deb1222752d.jpg',
+        'uid': 'wkd6djc',
+        'id': '55333001',
+        'created_time': '2023-02-05 03:25:20',
+        'content': """凌晨，空无一人的候车大厅，车票对应的检票口显示屏乱码"""
     }
     BLOCK_1_DATA = {
         'image_url': None,
-        'uid': 'JvnJBG5',
-        'id': '9800148',
-        'created_time': '2016-09-18 15:11:07',
-        'content': '选b啊！！'
+        'uid': 'wkd6djc',
+        'id': '55333007',
+        'created_time': '2023-02-05 03:26:06',
+        'content': "( ﾟ∀。)7要不还是买下一班车的票吧？"
     }
 
     def test_another_block(self, thread_list):
-        b = thread_list[4]
-        assert b.content == """<span class="reply-color"><font color="#789922">&gt;&gt;No.9800114</font></span><br/>……出题老师可以的"""
+        b = thread_list[3]
+        assert b.content == """这乱码乱出来的图案还挺整齐的(´ﾟДﾟ`)"""
