@@ -12,11 +12,11 @@ The content will be saved as html file.
 
 So far, `Island Backup` Support website below
 
-- A岛 (https://h.nimingban.com/)
-- kukuku (http://kukuku.cc/)
-- 备胎岛 (http://h.adnmb.com/Forum)
+- A岛 (https://www.nmbxd1.com/)
 - 4chan (http://www.4chan.org/)
 - 2chan (http://www.2chan.net/)
+- <del>支持kukuku (http://kukuku.cc/)</del>
+- <del>支持备胎岛 (http://h.adnmb.com/Forum)</del>
 
 
 |Shell-Animation|
@@ -99,6 +99,6 @@ ScreenShot
     :target: https://pypi.python.org/pypi/island-backup
 ..  |LICENCE| image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)
     :target: https://github.com/littlezz/island-backup/blob/master/LICENSE
-..  |ScreenShot-1| image:: https://raw.githubusercontent.com/littlezz/island-backup/master/screenshot/html-preview.jpg
+..  |ScreenShot-1| image:: https://raw.githubusercontent.com/littlezz/island-backup/master/screenshot/screenshot2.jpg
 ..  |Shell-Animation| image:: https://raw.githubusercontent.com/littlezz/island-backup/master/screenshot/shell.gif
 

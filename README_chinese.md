@@ -114,7 +114,7 @@ Options:
 
 Screenshot
 ----------
-![](/screenshot/html-preview.jpg)
+![](/screenshot/screenshot2.jpg)
 
 
 Changelog
