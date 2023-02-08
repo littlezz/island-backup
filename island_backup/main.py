@@ -34,6 +34,8 @@ TEMPLATES_PATH = os.path.join(BASE, 'templates')
 
 
 env = Environment(loader=FileSystemLoader(TEMPLATES_PATH), trim_blocks=True)
+loop_runner = asyncio.Runner()
+loop_runner.get_loop()
 
 
 
@@ -217,9 +219,9 @@ def start(url, force_update):
     loop.run_forever()
 
 
-async def verify_proxy():
+async def verify_proxy(proxy):
     url = 'https://api.github.com/users/littlezz'
-    async with network.session.get(url) as r:
+    async with network.session.get(url, proxy=proxy) as r:
         status = r.status
         logging.info('test proxy status, [{}]'.format(status))
         assert r.status == 200
@@ -252,7 +254,7 @@ def parse_ipaddress(ctx, param, value):
 @click.option('--force-update', is_flag=True, help='force update image', default=settings['force-update'])
 @click.option('--conn-count', type=click.IntRange(1, 20), default=settings['conn-count'],
               help='max conn number connector use. from 1 to 20. Default is 20')
-@click.option('--proxy', '-p', required=False, callback=parse_ipaddress, default=settings['proxy'],
+@click.option('--proxy', '-p', required=False, default=settings['proxy'],
               help='socks proxy address, ex, 127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
@@ -274,21 +276,17 @@ def cli(url, debug, force_update, conn_count, proxy):
         # conn_timeout=60
     )
 
-#TODO: fix proxy
-    if not proxy:
-        _conn = aiohttp.TCPConnector(**conn_kwargs)
-    else:
-        #_conn = SocksConnector(aiosocks.Socks5Addr(proxy[0], proxy[1]), **conn_kwargs)
-        pass
-
+    if proxy:
+       network.proxy = proxy
+    _conn = aiohttp.TCPConnector(**conn_kwargs)
     network.session = aiohttp.ClientSession(connector=_conn)
 
     try:
         try:
             if proxy:
                 logging.info('Test whether proxy config is correct')
-                asyncio.run(verify_proxy())
-        except (aiohttp.errors.ProxyConnectionError, ConnectionRefusedError, AssertionError) as e:
+                loop_runner.run(verify_proxy(proxy))
+        except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
             print('Proxy config is wrong!\n {}'.format(e))
 
         else:

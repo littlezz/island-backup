@@ -5,6 +5,7 @@ from .utils import EMPTY_DATA
 
 
 session = None
+proxy = None
 
 
 async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
@@ -14,7 +15,7 @@ async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
 
     while _retry < retry:
         try:
-            async with session.get(url, headers=headers) as r:
+            async with session.get(url, headers=headers,proxy=proxy) as r:
                 data = await getattr(r, as_type)()
         except:
             # sleep 0s, 1s, 3s
