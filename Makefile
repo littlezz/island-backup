@@ -16,3 +16,6 @@ pypi:
 	rm -r dist/
 	python3 setup.py bdist_wheel sdist
 	twine upload dist/*
+
+clear_backup_folder:
+	rm -r backup/
