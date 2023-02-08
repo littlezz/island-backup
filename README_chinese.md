@@ -86,7 +86,7 @@ Options:
   --force-update              force update image
   --conn-count INTEGER RANGE  max conn number connector use. from 1 to 20.
                               Default is no limit
-  -p, --proxy TEXT            socks proxy address, ex, 127.0.0.1:1080
+  -p, --proxy TEXT            http proxy address, ex, http://127.0.0.1:1080
   --version                   Show the version and exit.
   --help                      Show this message and exit.
  
@@ -102,7 +102,7 @@ Options:
 {
   "conn-count": "10",
   "debug": true,
-  "proxy": "127.0.0.1:1080"
+  "proxy": "http://127.0.0.1:1080"
 }
 ```
 
