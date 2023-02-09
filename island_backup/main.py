@@ -17,6 +17,8 @@ from .network import get_data
 from . import version as __version__
 logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
+from typing import Optional
+import code
 
 ##########
 # setup
@@ -26,7 +28,10 @@ logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {m
 bundle_env = getattr(sys, 'frozen', False)
 
 if bundle_env:
-    BASE = sys._MEIPASS
+    # pyinstaller attribute, work on windows
+    BASE = sys._MEIPASS # type: ignore
+    
+
 else:
     BASE = os.path.dirname(__file__)
 
@@ -51,11 +56,11 @@ def template_render(name, **context):
 
 
 class ImageManager:
-    def __init__(self, image_dir, loop, max_tasks=150, force_update=False):
+    def __init__(self, image_dir, max_tasks=150, force_update=False):
         self.url_set = set()
         self.sem = asyncio.Semaphore(max_tasks)
-        self.busying = set()
-        self.loop = loop
+        self.busying_url = set()
+        self.busying_task = set()
         self.image_dir = image_dir
         self.pdbar = tqdm(desc='image downloading...', position=1)
         # force update image
@@ -72,8 +77,13 @@ class ImageManager:
         file_name = self.get_image_name(url)
         file_path = os.path.join(self.image_dir, file_name)
         return file_path
-
+    
     async def submit(self, url, headers=None):
+        task = asyncio.create_task(self._download(url, headers=headers))
+        self.busying_task.add(task)
+        task.add_done_callback(self.busying_task.discard)
+
+    async def _download(self, url, headers=None):
         if url in self.url_set:
             return
         else:
@@ -84,17 +94,15 @@ class ImageManager:
         if not self.force_update and os.path.exists(file_path):
             return
 
-        self.busying.add(url)
-        await self.sem.acquire()
-        task = asyncio.ensure_future(get_data(url, as_type='read',
-                                              headers=headers,
-                                              callback=partial(self.save_file, file_path=file_path)))
 
-        task.add_done_callback(lambda t: self.sem.release())
-        task.add_done_callback(lambda t: self.busying.remove(url))
-        task.add_done_callback(lambda t: self.status_info())
 
-    async def save_file(self, data, url, file_path):
+        data = await get_data(url, as_type='read', headers=headers,)
+        await self.save_file(data, file_path=file_path)
+        self.sem.release()
+        self.status_info()
+    
+
+    async def save_file(self, data, file_path):
         content = data
         if not content:
             logging.debug('no data available')
@@ -106,22 +114,26 @@ class ImageManager:
             f.write(content)
 
     async def wait_all_task_done(self):
-        logging.debug('begin waiting')
-        while True:
-            await asyncio.sleep(3)
-            if not self.busying:
-                logging.debug('Finish Waitting, all images has been downloaded')
-                break
-            logging.debug('Still waitting for all images be downloaded')
-        self.loop.stop()
+        # logging.debug('begin waiting')
+        # while True:
+        #     await asyncio.sleep(3)
+        #     if not self.busying_url:
+        #         logging.debug('Finish Waitting, all images has been downloaded')
+        #         break
+        #     logging.debug('Still waitting for all images be downloaded')
+        # self.pdbar.close()
+
+
+        await asyncio.gather(*self.busying_task)
+
         self.pdbar.close()
 
     def status_info(self):
         self.pdbar.update()
 
-        logging.debug('this is {} in busying'.format(len(self.busying)))
+        logging.debug('this is {} in busying'.format(len(self.busying_url)))
         urls = []
-        for i, url in enumerate(self.busying):
+        for i, url in enumerate(self.busying_url):
             if i >= 3:
                 break
             urls.append(url)
@@ -170,7 +182,8 @@ def split_page_write(path, filename, blocks, page_num=50, force_update=False):
     _cp_static_file(path, force_update=force_update)
 
 
-async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=None, force_update=False):
+async def main_processor(first_url, image_manager:ImageManager,base_dir=None, folder_name=None,  force_update=False) -> None:
+    _tasks = []
     Page = island_switcher.island_page_model
     all_blocks = []
     p = await Page.from_url(first_url, page_num=1)
@@ -180,9 +193,10 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
         thread_list = p.thread_list()
         for block in thread_list:
             if block.image_url:
-                asyncio.ensure_future(image_manager.submit(block.image_url, headers=block.headers))
+                await image_manager.submit(block.image_url, headers=block.headers)
                 block.image = 'image/' + image_manager.get_image_name(block.image_url)
                 logging.debug('block.image set to -> %s', block.image)
+
         all_blocks.extend(thread_list)
 
         if p.has_next():
@@ -197,26 +211,21 @@ async def run(first_url, loop, base_dir=None, folder_name=None, image_manager=No
 
 
 
-def start(url, force_update):
-
-    first_url = url
-    # first_url = 'http://h.nimingban.com/t/117617'
-    # first_url = 'http://h.nimingban.com/t/6048436?r=6048436'
-    # first_url = 'http://h.nimingban.com/t/7317491?r=7317491'
-    island_switcher.detect_by_url(first_url)
-    first_url = island_switcher.sanitize_url(first_url)
-    folder_name = island_switcher.get_folder_name(url)
+def start(raw_url, force_update):
+    island_switcher.detect_by_url(raw_url)
+    sanitized_url = island_switcher.sanitize_url(raw_url)
+    folder_name = island_switcher.get_folder_name(raw_url)
     base_dir = os.path.join('backup', folder_name)
     image_dir = os.path.join(base_dir, 'image')
     os.makedirs(image_dir, exist_ok=True)
 
-    logging.info('url is %s', first_url)
+    logging.info('url is %s', sanitized_url)
     logging.info('island is %s', island_switcher.island)
-    loop = asyncio.get_event_loop()
-    image_manager = ImageManager(image_dir, loop, force_update=force_update)
-    loop.create_task(run(first_url, loop, base_dir=base_dir, image_manager=image_manager,
+
+    image_manager = ImageManager(image_dir, force_update=force_update)
+    loop_runner.run(main_processor(sanitized_url, base_dir=base_dir, image_manager=image_manager,
                          folder_name=folder_name, force_update=force_update))
-    loop.run_forever()
+  
 
 
 async def verify_proxy(proxy):
@@ -291,9 +300,12 @@ def cli(url, debug, force_update, conn_count, proxy):
 
         else:
             start(url, force_update)
+    except:
+        raise
 
     finally:
-        asyncio.run(network.session.close())
+        loop_runner.run(network.session.close())
+        loop_runner.close()
         if bundle_env:
             click.echo('\n')
             input('Press any key to exit')

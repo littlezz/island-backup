@@ -1,10 +1,12 @@
 import asyncio
 import logging
 import traceback
+import aiohttp
+from typing import Optional
 from .utils import EMPTY_DATA
 
 
-session = None
+session: aiohttp.ClientSession|None = None
 proxy = None
 
 
@@ -27,11 +29,11 @@ async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
             break
     else:
         logging.error('\n Ignore Error:....\n%s\n...end\n', _log_error)
-        print('Empyt data')
+        print('Empyt data:',url)
         return EMPTY_DATA
 
     logging.debug('finish request %s', url)
     if callback:
-        asyncio.ensure_future(callback(data, url))
+        asyncio.create_task(callback(data, url))
     else:
         return data
