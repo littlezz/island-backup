@@ -258,17 +258,6 @@ def cli_url_verify(ctx, param, value):
     return value
 
 
-def parse_ipaddress(ctx, param, value):
-    if value is None:
-        return
-    host_port = value.split(':')
-    host = host_port[0]
-    if len(host_port) == 2:
-        port = host_port[1]
-    else:
-        port = None
-    return host, port
-
 
 @click.command()
 @click.argument('url', required=False, callback=cli_url_verify)
