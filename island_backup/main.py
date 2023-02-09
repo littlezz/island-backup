@@ -212,19 +212,8 @@ async def main_processor(first_url, image_manager:ImageManager,base_dir=None, fo
 
 
 async def start(raw_url, force_update, proxy=None, conn_kwargs={}):
-    if proxy:
-       network.proxy = proxy
-    _conn = aiohttp.TCPConnector(**conn_kwargs)
-    network.session = aiohttp.ClientSession(connector=_conn)
-    try:
-        if proxy:
-            logging.info('Test whether proxy config is correct')
-            await verify_proxy(proxy)
-    except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
-        print('Proxy config is wrong!\n {}'.format(e))
-        exit()
-
-
+    await network.client.init_client(proxy=proxy,conn_kwargs=conn_kwargs)
+    
     island_switcher.detect_by_url(raw_url)
     sanitized_url = island_switcher.sanitize_url(raw_url)
     folder_name = island_switcher.get_folder_name(raw_url)

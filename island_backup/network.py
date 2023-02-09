@@ -37,3 +37,35 @@ async def get_data(url, callback=None, as_type='json', headers=None, retry=3):
         asyncio.create_task(callback(data, url))
     else:
         return data
+    
+
+
+
+
+class _Client:
+    def __init__(self) -> None:
+        self._session:aiohttp.ClientSession = None
+        self.proxy = None
+
+    async def get_data(self):
+        pass
+
+    async def init_client(self, proxy=None,conn_kwargs=None):
+        connector = aiohttp.TCPConnector(**conn_kwargs) if conn_kwargs else aiohttp.TCPConnector()
+        self._session = aiohttp.ClientSession(connector=connector)
+        self.proxy = proxy
+        try:
+            logging.info('Test whether proxy config is correct')
+            await self.verify_proxy_server()
+        except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
+            print('Proxy config is wrong!\n {}'.format(e))
+            exit()
+    
+    async def close(self):
+        await self._session.close()
+
+    async def verify_proxy_server(self):
+        pass
+
+
+client = _Client()
