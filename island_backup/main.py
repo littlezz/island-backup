@@ -39,8 +39,8 @@ TEMPLATES_PATH = os.path.join(BASE, 'templates')
 
 
 env = Environment(loader=FileSystemLoader(TEMPLATES_PATH), trim_blocks=True)
-loop_runner = asyncio.Runner()
-loop_runner.get_loop()
+# loop_runner = asyncio.Runner()
+# loop_runner.get_loop()
 
 
 
@@ -211,7 +211,20 @@ async def main_processor(first_url, image_manager:ImageManager,base_dir=None, fo
 
 
 
-def start(raw_url, force_update):
+async def start(raw_url, force_update, proxy=None, conn_kwargs={}):
+    if proxy:
+       network.proxy = proxy
+    _conn = aiohttp.TCPConnector(**conn_kwargs)
+    network.session = aiohttp.ClientSession(connector=_conn)
+    try:
+        if proxy:
+            logging.info('Test whether proxy config is correct')
+            await verify_proxy(proxy)
+    except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
+        print('Proxy config is wrong!\n {}'.format(e))
+        exit()
+
+
     island_switcher.detect_by_url(raw_url)
     sanitized_url = island_switcher.sanitize_url(raw_url)
     folder_name = island_switcher.get_folder_name(raw_url)
@@ -223,8 +236,9 @@ def start(raw_url, force_update):
     logging.info('island is %s', island_switcher.island)
 
     image_manager = ImageManager(image_dir, force_update=force_update)
-    loop_runner.run(main_processor(sanitized_url, base_dir=base_dir, image_manager=image_manager,
-                         folder_name=folder_name, force_update=force_update))
+    await main_processor(sanitized_url, base_dir=base_dir, image_manager=image_manager,
+                         folder_name=folder_name, force_update=force_update)
+    await network.session.close()
   
 
 
@@ -264,7 +278,7 @@ def parse_ipaddress(ctx, param, value):
 @click.option('--conn-count', type=click.IntRange(1, 20), default=settings['conn-count'],
               help='max conn number connector use. from 1 to 20. Default is 20')
 @click.option('--proxy', '-p', required=False, default=settings['proxy'],
-              help='socks proxy address, ex, 127.0.0.1:1080')
+              help='http proxy, ex, http://127.0.0.1:1080')
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
     click.echo('version: {}'.format(__version__))
@@ -278,35 +292,16 @@ def cli(url, debug, force_update, conn_count, proxy):
     logging.info('force-update is %s', force_update)
 
     logging.debug('settings: {}'.format(settings))
-
     conn_kwargs = dict(
         use_dns_cache=True,
         limit=conn_count,
-        # conn_timeout=60
+
     )
 
-    if proxy:
-       network.proxy = proxy
-    _conn = aiohttp.TCPConnector(**conn_kwargs)
-    network.session = aiohttp.ClientSession(connector=_conn)
 
-    try:
-        try:
-            if proxy:
-                logging.info('Test whether proxy config is correct')
-                loop_runner.run(verify_proxy(proxy))
-        except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
-            print('Proxy config is wrong!\n {}'.format(e))
+    asyncio.run(start(url, force_update,proxy=proxy, conn_kwargs=conn_kwargs))
 
-        else:
-            start(url, force_update)
-    except:
-        raise
-
-    finally:
-        loop_runner.run(network.session.close())
-        loop_runner.close()
-        if bundle_env:
+    if bundle_env:
             click.echo('\n')
             input('Press any key to exit')
 
