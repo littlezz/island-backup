@@ -72,7 +72,7 @@ class NiMingBanPage(AIslandGetThreadId, BasePage):
         return threads
 
     def has_next(self):
-        if self.bs.find('a', text='下一页'):
+        if self.bs.find('a', string='下一页'):
             return True
         return False
 

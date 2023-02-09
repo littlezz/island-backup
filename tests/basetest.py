@@ -15,7 +15,7 @@ async def get_page(url):
     url = island_switcher.sanitize_url(url)
     print(url)
     p = await island_switcher.island_page_model.from_url(url, page_num=1)
-    network.session.close()
+    await network.session.close()
     return p
 
 
@@ -37,7 +37,7 @@ class BaseTest:
 
     @pytest.fixture(scope='class')
     def page(self):
-        return asyncio.get_event_loop().run_until_complete(get_page(self.RAW_URLS[0]))
+        return asyncio.run(get_page(self.RAW_URLS[0]))
 
     @pytest.fixture(scope='class')
     def thread_list(self, page):
