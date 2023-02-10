@@ -1,24 +1,22 @@
+import asyncio
+import logging
 import os
 import shutil
 import sys
-import aiohttp
-import asyncio
-from functools import partial
 import urllib.parse as urllib_parse
-from island_backup.island_switcher import island_switcher
-from .settings import settings
-from jinja2 import Environment, FileSystemLoader
+
 import click
+from jinja2 import Environment, FileSystemLoader
 from tqdm import tqdm
-import logging
+
+from island_backup.island_switcher import island_switcher
 
 from . import network
-from .network import get_data
 from . import version as __version__
+from .settings import settings
+
 logging.basicConfig(level=logging.INFO, format='{asctime}:{name}:{levelname}: {message}', style='{')
 
-from typing import Optional
-import code
 
 ##########
 # setup
@@ -96,7 +94,7 @@ class ImageManager:
 
 
 
-        data = await get_data(url, as_type='read', headers=headers,)
+        data = await network.client.get_data(url, as_type='read', headers=headers,)
         await self.save_file(data, file_path=file_path)
         self.sem.release()
         self.status_info()
@@ -114,19 +112,9 @@ class ImageManager:
             f.write(content)
 
     async def wait_all_task_done(self):
-        # logging.debug('begin waiting')
-        # while True:
-        #     await asyncio.sleep(3)
-        #     if not self.busying_url:
-        #         logging.debug('Finish Waitting, all images has been downloaded')
-        #         break
-        #     logging.debug('Still waitting for all images be downloaded')
-        # self.pdbar.close()
-
-
         await asyncio.gather(*self.busying_task)
-
         self.pdbar.close()
+
 
     def status_info(self):
         self.pdbar.update()
@@ -227,16 +215,8 @@ async def start(raw_url, force_update, proxy=None, conn_kwargs={}):
     image_manager = ImageManager(image_dir, force_update=force_update)
     await main_processor(sanitized_url, base_dir=base_dir, image_manager=image_manager,
                          folder_name=folder_name, force_update=force_update)
-    await network.session.close()
+    await network.client.close()
   
-
-
-async def verify_proxy(proxy):
-    url = 'https://api.github.com/users/littlezz'
-    async with network.session.get(url, proxy=proxy) as r:
-        status = r.status
-        logging.info('test proxy status, [{}]'.format(status))
-        assert r.status == 200
 
 
 def cli_url_verify(ctx, param, value):

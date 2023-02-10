@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 from ..utils import EMPTY_DATA
-from ..network import get_data
+from ..network import client
 import re
 
 
@@ -16,7 +16,7 @@ class BasePage:
     @classmethod
     async def from_url(cls, base_url, page_num):
         # always request first page url
-        data = await get_data(cls.url_page_combine(base_url, page_num), as_type='text')
+        data = await client.get_data(cls.url_page_combine(base_url, page_num), as_type='text')
         if data is EMPTY_DATA:
             asyncio.get_event_loop().stop()
 

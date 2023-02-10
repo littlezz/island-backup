@@ -1,6 +1,5 @@
 from island_backup import network
 from island_backup.island_switcher import island_switcher
-import aiohttp
 import asyncio
 import pytest
 
@@ -10,12 +9,12 @@ NO_NEXT_PAGE = object()
 
 
 async def get_page(url):
-    network.session = aiohttp.ClientSession()
+    await network.client.init_client()
     island_switcher.detect_by_url(url)
     url = island_switcher.sanitize_url(url)
     print(url)
     p = await island_switcher.island_page_model.from_url(url, page_num=1)
-    await network.session.close()
+    await network.client.close()
     return p
 
 
