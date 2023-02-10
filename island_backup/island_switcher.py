@@ -1,14 +1,10 @@
-from .islands.adnmb import AdnmbPage
 from .islands.nimingban import NiMingBanPage
-from .islands.kukuku import KukukuPage
 from .islands.the4chan import The4ChanPage
 from .islands.the2chan import The2ChanPage
 
 
 island_class_map = {
-    'adnmb': AdnmbPage,
     'nmbxd1': NiMingBanPage,
-    'kukuku': KukukuPage,
     '4chan': The4ChanPage,
     '2chan': The2ChanPage,
 }
@@ -16,7 +12,7 @@ island_class_map = {
 class IslandSwitcher:
     available_island = island_class_map.keys()
 
-    def __init__(self, island=None):
+    def __init__(self, island:str|None = None):
         self.island = island
 
     def detect_by_url(self, url):
