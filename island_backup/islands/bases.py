@@ -76,7 +76,7 @@ class BaseJsonPage(BasePage):
 
     @classmethod
     async def from_url(cls, base_url, page_num):
-        data = await get_data(cls.url_page_combine(base_url, page_num), as_type='json', headers=cls.request_headers)
+        data = await client.get_data(cls.url_page_combine(base_url, page_num), as_type='json', headers=cls.request_headers)
         if data is EMPTY_DATA:
             asyncio.get_event_loop().stop()
 

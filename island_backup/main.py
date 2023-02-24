@@ -138,7 +138,7 @@ async def start(raw_url, force_update, proxy=None, conn_kwargs={}):
     os.makedirs(image_dir, exist_ok=True)
 
     logging.info('url is %s', sanitized_url)
-    logging.info('island is %s', island_switcher.island)
+    logging.info('island is %s', island_switcher.island_model_name)
 
     image_manager = ImageManager(image_dir, force_update=force_update)
     await main_processor(sanitized_url, base_dir=base_dir, image_manager=image_manager,
@@ -150,10 +150,12 @@ async def start(raw_url, force_update, proxy=None, conn_kwargs={}):
 def cli_url_verify(ctx, param, value):
     if value is None:
         return
-    if not any(i in value for i in island_switcher.available_island):
+    if not any(i in value for i in island_switcher.available_island_url_name):
         raise click.BadParameter('Unsupported url {}:'.format(value))
     return value
 
+def specify_island_model(ctx, param, value):
+    raise
 
 
 @click.command()
@@ -165,6 +167,8 @@ def cli_url_verify(ctx, param, value):
               help='max conn number connector use. from 1 to 20. Default is 20')
 @click.option('--proxy', '-p', required=False, default=settings['proxy'],
               help='http proxy, ex, http://127.0.0.1:1080')
+@click.option('--use', required=False, callback=specify_island_model,
+              help="Select model for url: Nimingban, 2Chan, 4Chan")
 @click.version_option(version=__version__)
 def cli(url, debug, force_update, conn_count, proxy):
     click.echo('version: {}'.format(__version__))
