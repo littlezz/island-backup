@@ -127,10 +127,12 @@ async def main_processor(first_url, image_manager:ImageManager,base_dir=None, fo
 
 
 
-async def start(raw_url, force_update, proxy=None, conn_kwargs={}):
+async def start(raw_url, force_update, proxy=None, conn_kwargs={}, use_model_name=None):
     await network.client.init_client(proxy=proxy,conn_kwargs=conn_kwargs)
-    
-    island_switcher.detect_by_url(raw_url)
+    if use_model_name:
+        island_switcher.specify_island_model(use_model_name)
+    else:
+        island_switcher.detect_by_url(raw_url)
     sanitized_url = island_switcher.sanitize_url(raw_url)
     folder_name = island_switcher.get_folder_name(raw_url)
     base_dir = os.path.join('backup', folder_name)
@@ -155,7 +157,12 @@ def cli_url_verify(ctx, param, value):
     return value
 
 def specify_island_model(ctx, param, value):
-    raise
+    if value is None:
+        return
+    value = value.lower()
+    if not any(value==i for i in island_switcher.available_island_model_name):
+        raise click.BadParameter('Unknown island model, avaialable model is {}.'.format(', '.join(island_switcher.available_island_model_name)))
+    return value
 
 
 @click.command()
@@ -167,10 +174,10 @@ def specify_island_model(ctx, param, value):
               help='max conn number connector use. from 1 to 20. Default is 20')
 @click.option('--proxy', '-p', required=False, default=settings['proxy'],
               help='http proxy, ex, http://127.0.0.1:1080')
-@click.option('--use', required=False, callback=specify_island_model,
+@click.option('--use', 'use_model', required=False, callback=specify_island_model,default=None,
               help="Select model for url: Nimingban, 2Chan, 4Chan")
 @click.version_option(version=__version__)
-def cli(url, debug, force_update, conn_count, proxy):
+def cli(url, debug, force_update, conn_count, proxy, use_model):
     click.echo('version: {}'.format(__version__))
 
     if debug:
@@ -189,7 +196,7 @@ def cli(url, debug, force_update, conn_count, proxy):
     )
 
 
-    asyncio.run(start(url, force_update,proxy=proxy, conn_kwargs=conn_kwargs))
+    asyncio.run(start(url, force_update,proxy=proxy, conn_kwargs=conn_kwargs, use_model_name=use_model))
 
     if bundle_env:
             click.echo('\n')
