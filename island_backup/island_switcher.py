@@ -19,7 +19,7 @@ class IslandSwitcher:
     available_island_model_name = [i.name for i in island_model_index]
 
     def __init__(self):
-        self._island_model:IslandModel = None
+        self._island_model:IslandModel = None # type: ignore
         self._specify_model_flag:bool = False
 
     def detect_by_url(self, url):

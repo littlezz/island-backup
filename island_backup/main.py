@@ -195,6 +195,8 @@ def cli(url, debug, force_update, conn_count, proxy, use_model, dry_run):
     logging.info('conn number is %s', conn_count)
     logging.info('proxy is %s', proxy)
     logging.info('force-update is %s', force_update)
+    if use_model:
+        logging.info('user-specify model, use {} model'.format(use_model))
 
     logging.debug('settings: {}'.format(settings))
     conn_kwargs = dict(
