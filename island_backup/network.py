@@ -27,7 +27,7 @@ class _Client:
         self._session = aiohttp.ClientSession(connector=connector)
         self.proxy = proxy
         try:
-            logging.info('Test whether proxy config is correct')
+            logging.info('Test whether proxy config is correct{}'.format(self.proxy))
             await self.verify_proxy_server()
         except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
             print('Proxy config is wrong!\n {}'.format(e))

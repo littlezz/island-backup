@@ -38,7 +38,7 @@ class IslandSwitcher:
         model_name = model_name.lower()
         for island_model in island_model_index:
             if model_name == island_model.name:
-                self.island_model = island_model
+                self._island_model = island_model
                 self._specify_model_flag = True
                 return True
         else:

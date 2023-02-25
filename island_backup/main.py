@@ -125,9 +125,12 @@ async def main_processor(first_url, image_manager:ImageManager,base_dir=None, fo
     process_bar.close()
     await image_manager.wait_all_task_done()
 
+async def dead():
+    await network.client.close()
+    exit()
 
 
-async def start(raw_url, force_update, proxy=None, conn_kwargs={}, use_model_name=None):
+async def start(raw_url, force_update, proxy=None, conn_kwargs={}, use_model_name=None, dry_run=False):
     await network.client.init_client(proxy=proxy,conn_kwargs=conn_kwargs)
     if use_model_name:
         island_switcher.specify_island_model(use_model_name)
@@ -137,10 +140,12 @@ async def start(raw_url, force_update, proxy=None, conn_kwargs={}, use_model_nam
     folder_name = island_switcher.get_folder_name(raw_url)
     base_dir = os.path.join('backup', folder_name)
     image_dir = os.path.join(base_dir, 'image')
-    os.makedirs(image_dir, exist_ok=True)
-
     logging.info('url is %s', sanitized_url)
     logging.info('island is %s', island_switcher.island_model_name)
+    if dry_run:
+        await dead()
+    os.makedirs(image_dir, exist_ok=True)
+
 
     image_manager = ImageManager(image_dir, force_update=force_update)
     await main_processor(sanitized_url, base_dir=base_dir, image_manager=image_manager,
@@ -150,6 +155,8 @@ async def start(raw_url, force_update, proxy=None, conn_kwargs={}, use_model_nam
 
 
 def cli_url_verify(ctx, param, value):
+    if ctx.params.get('dry_run'):
+        return value
     if value is None:
         return
     if not any(i in value for i in island_switcher.available_island_url_name):
@@ -176,8 +183,9 @@ def specify_island_model(ctx, param, value):
               help='http proxy, ex, http://127.0.0.1:1080')
 @click.option('--use', 'use_model', required=False, callback=specify_island_model,default=None,
               help="Select model for url: Nimingban, 2Chan, 4Chan")
+@click.option("--dry-run", is_flag=True, default=False, is_eager=True)
 @click.version_option(version=__version__)
-def cli(url, debug, force_update, conn_count, proxy, use_model):
+def cli(url, debug, force_update, conn_count, proxy, use_model, dry_run):
     click.echo('version: {}'.format(__version__))
 
     if debug:
@@ -196,7 +204,8 @@ def cli(url, debug, force_update, conn_count, proxy, use_model):
     )
 
 
-    asyncio.run(start(url, force_update,proxy=proxy, conn_kwargs=conn_kwargs, use_model_name=use_model))
+    asyncio.run(start(url, force_update,proxy=proxy, conn_kwargs=conn_kwargs,
+                       use_model_name=use_model,dry_run=dry_run))
 
     if bundle_env:
             click.echo('\n')
