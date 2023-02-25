@@ -26,14 +26,9 @@ class _Client:
         connector = aiohttp.TCPConnector(**conn_kwargs) if conn_kwargs else aiohttp.TCPConnector()
         self._session = aiohttp.ClientSession(connector=connector)
         self.proxy = proxy
-        try:
-            logging.info('Test whether proxy config is correct{}'.format(self.proxy))
+        if self.proxy is not None:
             await self.verify_proxy_server()
-        except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
-            print('Proxy config is wrong!\n {}'.format(e))
-            await self._dead()
 
-    
     async def _dead(self):
         await self.close()
         exit()
@@ -42,11 +37,15 @@ class _Client:
         await self._session.close()
 
     async def verify_proxy_server(self):
-        url = 'https://api.github.com/users/littlezz'
-        async with self._session.get(url, proxy=self.proxy) as r:
-            status = r.status
-            logging.info('test proxy status, [{}]'.format(status))
-            assert r.status == 200
-
+        try:
+            logging.info('Test whether proxy config is correct,proxy server is {}'.format(self.proxy))
+            url = 'https://api.github.com/users/littlezz'
+            async with self._session.get(url, proxy=self.proxy) as r:
+                status = r.status
+                logging.info('test proxy status, [{}]'.format(status))
+                assert r.status == 200
+        except (aiohttp.ClientHttpProxyError, ConnectionRefusedError, AssertionError) as e:
+            print('Proxy config is wrong!\n {}'.format(e))
+            await self._dead()
 
 client = _Client()
