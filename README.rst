@@ -3,7 +3,7 @@ Island Backup
 
 |Author| |Python-Version| |PyPI-Status| |LICENCE|
 
-`Island Backup` is a utility that download threads content and images from Anonymously broad website.
+`Island Backup` is a utility that downloads  threads, contents and images from Anonymously broad website.
 The content will be saved as html file.
 
 `Island Backup` is written by aiohttp which use `asyncio`, so only support Python3.
